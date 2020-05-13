@@ -6,22 +6,26 @@ namespace CommandsFunction
 {
     public class Game : IGame
     {
-        public IList<Player> Players { get; }
+        private IList<Player> _players { get; }
 
         public Game(string gameState)
         {
-            Players = JsonSerializer.Deserialize<IList<Player>>(gameState);
+            _players = JsonSerializer.Deserialize<IList<Player>>(gameState);
         }
 
-        public Player GetPlayer(string playerId) => Players.SingleOrDefault(player => player.Id == playerId);
-        public bool HasPlayer(string playerId) => Players.Any(p => p.Id == playerId);
+        public IEnumerable<Player> GetPlayers() => _players;
+        public Player GetPlayer(string playerId) => _players.SingleOrDefault(player => player.Id == playerId);
+
+        public bool HasPlayer(string playerId) => _players.Any(p => p.Id == playerId);
 
         public void AddPlayer(string playerId)
         {
             if (HasPlayer(playerId)) return;
 
             var newPlayer = new Player {Id = playerId, TotalPoints = 0};
-            Players.Add(newPlayer);
+            _players.Add(newPlayer);
         }
+
+        public string Serialize() => JsonSerializer.Serialize(_players);
     }
 }
