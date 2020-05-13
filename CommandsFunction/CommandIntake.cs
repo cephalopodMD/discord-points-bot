@@ -39,13 +39,13 @@ namespace CommandsFunction
             {
                 var gameState = await gameStateBlob.DownloadTextAsync();
                 var game = new Game(gameState);
-
+                 
                 var command = JsonDocument.Parse(commandPayload);
                 var action = _actionFactory(command);
 
                 action.Execute(game);
 
-                await BlobAccessRetryPolicy.ExecuteAsync(() => gameStateBlob.UploadTextAsync(JsonSerializer.Serialize(game.Players), new AccessCondition{ LeaseId = lease }, new BlobRequestOptions(), new OperationContext()));
+                await BlobAccessRetryPolicy.ExecuteAsync(() => gameStateBlob.UploadTextAsync(game.Serialize(), new AccessCondition{ LeaseId = lease }, new BlobRequestOptions(), new OperationContext()));
             }
             finally
             {

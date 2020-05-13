@@ -55,5 +55,19 @@ namespace PointsBot.Core
 
             return sender.SendAsync(message);
         }
+
+        public Task ResetPoints()
+        {
+            var sender = new MessageSender(_connection, "commands");
+            var messageBody = MessageTemplates.NukeIt();
+
+            var message = new Message
+            {
+                ContentType = "application/json",
+                Body = Encoding.UTF8.GetBytes(messageBody)
+            };
+
+            return sender.SendAsync(message);
+        }
     }
 }

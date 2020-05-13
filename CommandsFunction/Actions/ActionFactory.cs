@@ -31,6 +31,8 @@ namespace CommandsFunction.Actions
                     return new RemovePoints(payload.GetRawText(), Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"]));
                 case "init":
                     return new AddPlayer(payload.GetRawText());
+                case "nuke":
+                    return new ResetPoints();
                 default:
                     return NoAction;
             }
