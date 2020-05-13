@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json;
+using CommandsFunction.Actions.Management;
+using CommandsFunction.Actions.Point;
 using Microsoft.Extensions.Configuration;
 
 namespace CommandsFunction.Actions
@@ -24,11 +26,11 @@ namespace CommandsFunction.Actions
             switch (action.ToLowerInvariant())
             {
                 case "add":
-                    return new AddPointsAction(payload, Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"]));
+                    return new AddPoints(payload.GetRawText(), Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"]));
                 case "remove":
-                    return new RemovePointsAction(payload, Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"]));
+                    return new RemovePoints(payload.GetRawText(), Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"]));
                 case "init":
-                    return new AddPlayerAction(payload);
+                    return new AddPlayer(payload.GetRawText());
                 default:
                     return NoAction;
             }
