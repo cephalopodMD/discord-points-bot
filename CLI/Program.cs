@@ -35,6 +35,12 @@ namespace PointsBot.CLI
                     await sender.AddPlayer(args[1]);
                 }
                 break;
+                case "nuke":
+                {
+                    var sender = new CommandSender(_configuration["CommandServiceBusConnectionString"]);
+                    await sender.ResetPoints();
+                }
+                break;
                 default: break;
             }
         }
