@@ -15,6 +15,7 @@ namespace CommandsFunction.Actions.Point
         {
             var player = game.GetPlayer(_payload.PlayerId);
             if (player == null) return;
+            if (_payload.Amount < 0) return;
 
             var amountToAdd = _payload.Amount > _maxPointsPerAddAndSubtract ? _maxPointsPerAddAndSubtract : _payload.Amount;
             player.TotalPoints += amountToAdd;

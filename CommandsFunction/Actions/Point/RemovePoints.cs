@@ -13,6 +13,7 @@ namespace CommandsFunction.Actions.Point
         {
             var player = game.GetPlayer(_payload.PlayerId);
             if (player == null) return;
+            if (_payload.Amount < 0) return;
 
             var amountToRemove = _payload.Amount > _maxPointsToAddOrSubtract ? _maxPointsToAddOrSubtract : _payload.Amount;
             player.TotalPoints -= amountToRemove;
