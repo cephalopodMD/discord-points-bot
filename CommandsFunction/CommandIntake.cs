@@ -1,56 +1,41 @@
 using System;
-using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using CommandsFunction.Actions;
+using CommandsFunction.Events;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Polly;
-using Polly.Retry;
+using StackExchange.Redis;
 
 namespace CommandsFunction
 {
     public class CommandIntake
     {
-        private readonly Func<JsonDocument, IAction> _actionFactory;
-        
-        private static readonly TimeSpan LeaseSpan = new TimeSpan(0, 0, 1, 0);
-        private static readonly AsyncRetryPolicy BlobAccessRetryPolicy = Policy
-            .Handle<StorageException>()
-            .WaitAndRetryAsync(5,
-                attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
+        private readonly Func<JsonDocument, PointsEvent> _eventsFactory;
+        private readonly ConnectionMultiplexer _redis;
 
-        public CommandIntake(Func<JsonDocument, IAction> actionFactory)
+        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, ConnectionMultiplexer redis)
         {
-            _actionFactory = actionFactory;
+            _eventsFactory = eventsFactory;
+            _redis = redis;
         }
 
         [FunctionName("CommandIntake")]
-        public async Task Run([ServiceBusTrigger("commands", Connection = "PointsBotQueueConnection")]string commandPayload, 
-            [Blob("bot/users.json", FileAccess.ReadWrite, Connection = "Data")] CloudBlockBlob gameStateBlob,
-            ILogger log)
+        public Task Run([ServiceBusTrigger("commands", Connection = "PointsBotQueueConnection")]string commandPayload, ILogger log)
         {
-            var leaseId = Guid.NewGuid().ToString();
-            var lease = await BlobAccessRetryPolicy.ExecuteAsync(() => gameStateBlob.AcquireLeaseAsync(LeaseSpan, leaseId));
+            var dataBase = _redis.GetDatabase();
+            var command = JsonDocument.Parse(commandPayload);
 
-            try
+            var newEvent = _eventsFactory(command);
+            if (newEvent == null) return Task.CompletedTask;
+
+            var newEventTasks = new[]
             {
-                var gameState = await gameStateBlob.DownloadTextAsync();
-                var game = new Game(gameState);
-                 
-                var command = JsonDocument.Parse(commandPayload);
-                var action = _actionFactory(command);
+                dataBase.ListRightPushAsync($"{newEvent.Root}", JsonSerializer.Serialize(newEvent)),
+                dataBase.ListRightPushAsync($"{newEvent.Root}_{newEvent.PlayerId}",
+                    JsonSerializer.Serialize(newEvent.EventParameters))
+            };
 
-                action.Execute(game);
-
-                await BlobAccessRetryPolicy.ExecuteAsync(() => gameStateBlob.UploadTextAsync(game.Serialize(), new AccessCondition{ LeaseId = lease }, new BlobRequestOptions(), new OperationContext()));
-            }
-            finally
-            {
-                await BlobAccessRetryPolicy.ExecuteAsync(() => gameStateBlob.ReleaseLeaseAsync(new AccessCondition { LeaseId = lease }));
-            }
+            return Task.WhenAll(newEventTasks);
         }
     }
 }
