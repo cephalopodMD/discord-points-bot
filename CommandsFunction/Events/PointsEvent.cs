@@ -7,15 +7,9 @@ namespace CommandsFunction.Events
         [JsonIgnore]
         public string Root => "points";
 
-        public string PlayerId { get; }
+        public string PlayerId { get; set; }
 
-        public PointsEventParameters EventParameters { get; }
-
-        public PointsEvent(string playerId, PointsEventParameters eventParameters)
-        {
-            PlayerId = playerId;
-            EventParameters = eventParameters;
-        }
+        public PointsEventParameters EventParameters { get; set; }
     }
 
     public class PointsEventParameters

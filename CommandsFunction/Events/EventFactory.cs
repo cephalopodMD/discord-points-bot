@@ -16,13 +16,23 @@ namespace CommandsFunction.Events
                 case "remove":
                 {
                     var pointsPayload = JsonSerializer.Deserialize<Points>(payload.GetRawText());
-                    var pointsEvent = new PointsEvent(pointsPayload.PlayerId, new PointsEventParameters{Action = action.ToLowerInvariant(), Amount = pointsPayload.Amount});
 
-                    return pointsEvent;
+                    return new PointsEvent
+                    {
+                        PlayerId = pointsPayload.PlayerId,
+                        EventParameters = new PointsEventParameters
+                        {
+                            Action = action.ToLowerInvariant(),
+                            Amount = pointsPayload.Amount
+                        }
+                    };
                 }
                 case "nuke":
                 {
-                    return new PointsEvent(String.Empty, new PointsEventParameters{ Action = "nuke" });
+                    return new PointsEvent
+                    {
+                        EventParameters = new PointsEventParameters {Action = "nuke"}
+                    };
                 }
                 default:
                     return null;
