@@ -103,5 +103,15 @@ namespace Bot.Modules
 
             await Context.Channel.SendMessageAsync($"{playerState.TotalPoints}");
         }
+
+        [Command("total")]
+        public async Task GetTotalForUser()
+        {
+            var playerPointsResult = await _httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Context.User.Username}?code={_configuration["QueryKey"]}");
+            var playerState =
+                JsonSerializer.Deserialize<PlayerState>(await playerPointsResult.Content.ReadAsStringAsync(), JsonOptions);
+
+            await Context.Channel.SendMessageAsync($"{playerState.TotalPoints}");
+        }
     }
 }
