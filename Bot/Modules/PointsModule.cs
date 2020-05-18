@@ -36,6 +36,13 @@ namespace Bot.Modules
 
         [Command("give")]
         [RequireContext(ContextType.Guild)]
+        public async Task GivePoints(IGuildUser user, string amountOfPoints)
+        {
+            await Context.Channel.SendMessageAsync($"Give only accepts numbers");
+        }
+
+        [Command("give")]
+        [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints)
         {
             await Task.WhenAll(AddPoints(user, amountOfPoints));
@@ -58,6 +65,13 @@ namespace Bot.Modules
         public async Task TakeWithNoAmount(IGuildUser user)
         {
             await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try '@PBot give @{user.Username} 69'");
+        }
+
+        [Command("give")]
+        [RequireContext(ContextType.Guild)]
+        public async Task TakePoints(IGuildUser user, string amountOfPoints)
+        {
+            await Context.Channel.SendMessageAsync($"take only accepts numbers");
         }
 
         [Command("take")]
