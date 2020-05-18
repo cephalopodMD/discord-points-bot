@@ -1,4 +1,4 @@
-namespace CommandsFunction.Actions.Point
+namespace CommandsFunction.Events
 {
     public class Points
     {

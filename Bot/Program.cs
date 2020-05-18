@@ -65,14 +65,15 @@ namespace Bot
 
         private ServiceProvider ConfigureServices()
         {
-            return new ServiceCollection()
+            var serviceCollection = new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
-                .AddSingleton<HttpClient>()
                 .AddSingleton(Configuration)
-                .AddSingleton(provider => new CommandSender(Configuration["ServiceBusConnectionString"]))
-                .BuildServiceProvider();
+                .AddSingleton<HttpClient>()
+                .AddSingleton(provider => new CommandSender(Configuration["ServiceBusConnectionString"]));
+
+            return serviceCollection.BuildServiceProvider();
         }
     }
 }
