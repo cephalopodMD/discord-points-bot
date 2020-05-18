@@ -8,7 +8,7 @@ The Bot project runs in a continous Azure Web Job. Some configuration needed.
 Small project for directly dropping messages on the command queue.
 
 ## Function
-An Azure function with a service bus trigger. Reads commands off of queue and updates the blob store.
+An Azure function with a service bus trigger. Reads commands off of queue and event sources to Redis.
 Also has HTTP triggers to handle Query side.
 
 ## Core
