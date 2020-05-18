@@ -94,7 +94,7 @@ namespace Bot.Modules
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 
-        [Command("total")]
+        [Command("bank")]
         public async Task GetTotalForUser(IGuildUser user)
         {
             var playerPointsResult = await _httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{user.Username}?code={_configuration["QueryKey"]}");
@@ -104,7 +104,7 @@ namespace Bot.Modules
             await Context.Channel.SendMessageAsync($"{playerState.TotalPoints}");
         }
 
-        [Command("total")]
+        [Command("bank")]
         public async Task GetTotalForUser()
         {
             var playerPointsResult = await _httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Context.User.Username}?code={_configuration["QueryKey"]}");
