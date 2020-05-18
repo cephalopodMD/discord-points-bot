@@ -6,6 +6,7 @@ using CommandsFunction.Events;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using PointsBot.Core;
 using StackExchange.Redis;
 
 namespace CommandsFunction

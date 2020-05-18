@@ -1,7 +1,7 @@
-namespace CommandsFunction
+namespace PointsBot.Core
 {
     public class PlayerState
-    {
+    { 
         public long NumberOfEvents { get; set; }
 
         public string PlayerId { get; set; }
