@@ -87,7 +87,7 @@ namespace Bot.Modules
             var playerState =
                 JsonSerializer.Deserialize<PlayerState>(await playerPointsResult.Content.ReadAsStringAsync(), JsonOptions);
 
-            await Context.Channel.SendMessageAsync($"Total: {playerState.TotalPoints}");
+            await Context.Channel.SendMessageAsync($"{playerState.TotalPoints}");
         }
     }
 }
