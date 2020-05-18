@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandsFunction", "CommandsFunction\CommandsFunction.csproj", "{5F0D8317-A72F-4865-9CCE-726942B156B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Function", "CommandsFunction\Function.csproj", "{5F0D8317-A72F-4865-9CCE-726942B156B1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot", "Bot\Bot.csproj", "{18CB8D3B-4CC9-479F-896B-66E8E69AA0B1}"
 EndProject
