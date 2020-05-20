@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using CommandsFunction.Events;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
@@ -14,11 +15,13 @@ namespace CommandsFunction
     {
         private readonly Func<JsonDocument, PointsEvent> _eventsFactory;
         private readonly ConnectionMultiplexer _redis;
+        private readonly IConfiguration _configuration;
 
-        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, ConnectionMultiplexer redis)
+        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, ConnectionMultiplexer redis, IConfiguration configuration)
         {
             _eventsFactory = eventsFactory;
             _redis = redis;
+            _configuration = configuration;
         }
 
         [FunctionName("CommandIntake")]
@@ -30,16 +33,21 @@ namespace CommandsFunction
             var newEvent = _eventsFactory(command);
             if (newEvent == null) return Task.CompletedTask;
 
-            var newEventTasks = new[]
+            var rootKey = $"{newEvent.Root}";
+            var playerKey = $"{newEvent.Root}_{newEvent.TargetPlayerId}";
+            var timeoutKey = $"{newEvent.Root}_{newEvent.OriginPlayerId}_timeout";
+
+            if (dataBase.StringGet(timeoutKey) != RedisValue.Null) return Task.CompletedTask;
+
+            var newEventTasks = new Task[]
             {
-                dataBase.ListRightPushAsync($"{newEvent.Root}", JsonSerializer.Serialize(newEvent)),
-                dataBase.ListRightPushAsync($"{newEvent.Root}_{newEvent.PlayerId}",
-                    JsonSerializer.Serialize(newEvent.EventParameters))
+                dataBase.ListRightPushAsync(rootKey, JsonSerializer.Serialize(newEvent)),
+                dataBase.ListRightPushAsync(playerKey,
+                    JsonSerializer.Serialize(newEvent.EventParameters)),
+                dataBase.StringSetAsync(timeoutKey, new RedisValue("--expirykey--"), TimeSpan.FromSeconds(Double.Parse(_configuration["CommandTimeoutInSeconds"])))
             };
 
             return Task.WhenAll(newEventTasks);
         }
-
-        
     }
 }

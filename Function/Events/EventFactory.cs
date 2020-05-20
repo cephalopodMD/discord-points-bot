@@ -19,19 +19,13 @@ namespace CommandsFunction.Events
 
                     return new PointsEvent
                     {
-                        PlayerId = pointsPayload.PlayerId,
+                        OriginPlayerId = pointsPayload.OriginPlayerId,
+                        TargetPlayerId = pointsPayload.TargetPlayerId,
                         EventParameters = new PointsEventParameters
                         {
                             Action = action.ToLowerInvariant(),
                             Amount = pointsPayload.Amount
                         }
-                    };
-                }
-                case "nuke":
-                {
-                    return new PointsEvent
-                    {
-                        EventParameters = new PointsEventParameters {Action = "nuke"}
                     };
                 }
                 default:
