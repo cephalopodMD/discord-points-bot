@@ -1,6 +1,6 @@
 namespace CommandsFunction.Events
 {
-    public class Points
+    public class PointsCommand
     {
         public string OriginPlayerId { get; set; }
 

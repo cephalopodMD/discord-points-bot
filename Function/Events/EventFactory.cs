@@ -15,7 +15,7 @@ namespace CommandsFunction.Events
                 case "add":
                 case "remove":
                 {
-                    var pointsPayload = JsonSerializer.Deserialize<Points>(payload.GetRawText());
+                    var pointsPayload = JsonSerializer.Deserialize<PointsCommand>(payload.GetRawText());
 
                     return new PointsEvent
                     {
