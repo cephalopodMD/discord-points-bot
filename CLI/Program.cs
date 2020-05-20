@@ -19,26 +19,14 @@ namespace PointsBot.CLI
                 case "add":
                 {
                     var sender = new CommandSender(_configuration["CommandServiceBusConnectionString"]);
-                    await sender.AddPoints(args[1], Int32.Parse(args[2]));
+                    await sender.AddPoints(args[1], args[2], Int32.Parse(args[3]));
                 }
                 break;
                 case "remove":
                 {
                     var sender = new CommandSender(_configuration["CommandServiceBusConnectionString"]);
-                    await sender.RemovePoints(args[1], Int32.Parse(args[2]));
-                }
-                break;
-                case "init":
-                {
-                    var sender = new CommandSender(_configuration["CommandServiceBusConnectionString"]);
-                    await sender.AddPlayer(args[1]);
-                }
-                break;
-                case "nuke":
-                {
-                    var sender = new CommandSender(_configuration["CommandServiceBusConnectionString"]);
-                    await sender.ResetPoints();
-                }
+                    await sender.RemovePoints(args[1], args[2], Int32.Parse(args[3]));
+                } 
                 break;
                 default: break;
             }
