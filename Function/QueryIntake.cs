@@ -24,7 +24,7 @@ namespace CommandsFunction
             new Dictionary<string, PlayerState>();
 
         [FunctionName("GetPlayerPoints")]
-        public async Task<PlayerState> Run(
+        public async Task<PlayerState> GetPlayerPoints(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "points/{playerId}")]
             HttpRequest request, string playerId)
         {
@@ -71,6 +71,17 @@ namespace CommandsFunction
             }
 
             return playerState;
+        }
+
+        [FunctionName("GetTimeout")]
+        public async Task<object> GetPlayerTimeout(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "timeout/{playerId}")]
+            HttpRequest request, string playerId)
+        {
+            var database = _redis.GetDatabase();
+            var redisKey = $"points_{playerId}_timeout";
+
+            return database.StringGet(redisKey) == RedisValue.Null ? null : "timedout";
         }
     }
 }
