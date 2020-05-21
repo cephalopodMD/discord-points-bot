@@ -14,17 +14,17 @@ namespace Bot.Modules
     {
         private readonly CommandSender _sender;
         private readonly IConfiguration _configuration;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
 
-        public PointsModule(CommandSender sender, HttpClient httpClient, IConfiguration configuration)
+        public PointsModule(CommandSender sender, IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _sender = sender;
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
         }
 
@@ -97,7 +97,8 @@ namespace Bot.Modules
         [Command("bank")]
         public async Task GetTotalForUser(IGuildUser user)
         {
-            var playerPointsResult = await _httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{user.Username}?code={_configuration["QueryKey"]}");
+            var httpClient = _httpClientFactory.CreateClient();
+            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{user.Username}?code={_configuration["QueryKey"]}");
             var playerState =
                 JsonSerializer.Deserialize<PlayerState>(await playerPointsResult.Content.ReadAsStringAsync(), JsonOptions);
 
@@ -107,7 +108,8 @@ namespace Bot.Modules
         [Command("bank")]
         public async Task GetTotalForUser()
         {
-            var playerPointsResult = await _httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Context.User.Username}?code={_configuration["QueryKey"]}");
+            var httpClient = _httpClientFactory.CreateClient();
+            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Context.User.Username}?code={_configuration["QueryKey"]}");
             var playerState =
                 JsonSerializer.Deserialize<PlayerState>(await playerPointsResult.Content.ReadAsStringAsync(), JsonOptions);
 

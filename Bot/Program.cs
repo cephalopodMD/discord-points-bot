@@ -6,8 +6,10 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using PointsBot.Core.Commands;
 
 namespace Bot
@@ -22,24 +24,35 @@ namespace Bot
     // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
     class Program
     {
-        private static readonly IConfiguration Configuration = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .AddJsonFile("./local.appsettings.json", true, true)
-            .Build();
-
-        // There is no need to implement IDisposable like before as we are
-        // using dependency injection, which handles calling Dispose for us.
-        static void Main(string[] args)
-            => new Program().MainAsync().GetAwaiter().GetResult();
-
-        public async Task MainAsync()
+        public static async Task Main()
         {
-            // You should dispose a service provider created using ASP.NET
-            // when you are finished using it, at the end of your app's lifetime.
-            // If you use another dependency injection framework, you should inspect
-            // its documentation for the best way to do this.
-            using (var services = ConfigureServices())
+            var host = new HostBuilder()
+                .UseEnvironment("development")
+                .ConfigureAppConfiguration((context, configBuilder) =>
+                {
+                    configBuilder
+                        .AddEnvironmentVariables()
+                        .AddJsonFile("./local.appsettings.json");
+                })
+                .ConfigureWebJobs(b =>
+                {
+                    b.AddAzureStorageCoreServices();
+                    b.AddAzureStorage();
+                    b.Services.AddSingleton<DiscordSocketClient>()
+                        .AddSingleton<CommandService>()
+                        .AddSingleton<CommandHandlingService>()
+                        .AddSingleton<HttpClient>()
+                        .AddSingleton<IQueueClient>(provider =>
+                            new QueueClient(provider.GetService<IConfiguration>()["ServiceBusConnectionString"], "commands"))
+                        .AddSingleton<CommandSender>()
+                        .AddHttpClient();
+                })
+                .Build();
+
+            using (host)
             {
+                var services = host.Services;
+                var configuration = host.Services.GetRequiredService<IConfiguration>();
                 var client = services.GetRequiredService<DiscordSocketClient>();
 
                 client.Log += LogAsync;
@@ -47,7 +60,7 @@ namespace Bot
 
                 // Tokens should be considered secret data and never hard-coded.
                 // We can read from the environment variable to avoid hardcoding.
-                await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
+                await client.LoginAsync(TokenType.Bot, configuration["token"]);
                 await client.StartAsync();
 
                 // Here we initialize the logic required to register our commands.
@@ -57,26 +70,11 @@ namespace Bot
             }
         }
 
-        private Task LogAsync(LogMessage log)
+        private static Task LogAsync(LogMessage log)
         {
             Console.WriteLine(log.ToString());
 
             return Task.CompletedTask;
-        }
-
-        private ServiceProvider ConfigureServices()
-        {
-            var serviceCollection = new ServiceCollection()
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                .AddSingleton(Configuration)
-                .AddSingleton<HttpClient>()
-                .AddSingleton<IQueueClient>(provider =>
-                    new QueueClient(Configuration["ServiceBusConnectionString"], "commands"))
-                .AddSingleton<CommandSender>();
-
-            return serviceCollection.BuildServiceProvider();
         }
     }
 }
