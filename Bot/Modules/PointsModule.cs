@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Bot.Services;
 using Discord;
 using Discord.Commands;
 using Microsoft.Extensions.Configuration;
@@ -15,17 +16,19 @@ namespace Bot.Modules
         private readonly CommandSender _sender;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly PointsService _pointsService;
 
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
 
-        public PointsModule(CommandSender sender, IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public PointsModule(CommandSender sender, IHttpClientFactory httpClientFactory, IConfiguration configuration, PointsService pointsService)
         {
             _sender = sender;
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _pointsService = pointsService;
         }
 
         [Command("give")]
@@ -45,6 +48,13 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints)
         {
+            if (await _pointsService.IsPlayerTimedOut(user.Username))
+            {
+                await Context.User.SendMessageAsync(
+                    "You're doing that too much. You can only add or remove points once every couple of minutes'");
+                return;
+            }
+
             await Task.WhenAll(AddPoints(user, amountOfPoints));
         }
 
@@ -52,6 +62,13 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
+            if (await _pointsService.IsPlayerTimedOut(user.Username))
+            {
+                await Context.User.SendMessageAsync(
+                    "You're doing that too much. You can only add or remove points once every couple of minutes'");
+                return;
+            }
+
             await Task.WhenAll(AddPoints(user, amountOfPoints));
         }
 
@@ -78,6 +95,13 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints)
         {
+            if (await _pointsService.IsPlayerTimedOut(user.Username))
+            {
+                await Context.User.SendMessageAsync(
+                    "You're doing that too much. You can only add or remove points once every couple of minutes'");
+                return;
+            }
+
             await Task.WhenAll(RemovePoints(user, amountOfPoints));
         }
 
@@ -85,6 +109,12 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
+            if (await _pointsService.IsPlayerTimedOut(user.Username))
+            {
+                await Context.User.SendMessageAsync(
+                    "You're doing that too much. You can only add or remove points once every couple of minutes'");
+                return;
+            }
             await Task.WhenAll(RemovePoints(user, amountOfPoints));
         }
 
