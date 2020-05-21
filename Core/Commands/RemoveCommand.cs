@@ -13,7 +13,7 @@ namespace PointsBot.Core.Commands
 
         public string Serialize() => JsonSerializer.Serialize(_message);
 
-        private class RemovePointsMessage
+        public class RemovePointsMessage
         {
             public RemovePointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints)
             {
@@ -25,9 +25,9 @@ namespace PointsBot.Core.Commands
                 };
             }
 
-            public string Action = "remove";
+            public string Action { get; } = "remove";
 
-            private ObjectPayload Payload { get; set; }
+            public ObjectPayload Payload { get; set; }
         }
     }
 }

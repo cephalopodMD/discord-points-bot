@@ -13,7 +13,7 @@ namespace PointsBot.Core.Commands
 
         public string Serialize() => JsonSerializer.Serialize(_message);
 
-        private class AddPointsMessage
+        public class AddPointsMessage
         {
             public AddPointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints)
             {
@@ -25,9 +25,9 @@ namespace PointsBot.Core.Commands
                 };
             }
 
-            public string Action = "add";
+            public string Action { get; } = "add";
 
-            private ObjectPayload Payload { get; }
+            public ObjectPayload Payload { get; }
         }
     }
 }

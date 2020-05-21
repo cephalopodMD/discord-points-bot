@@ -23,7 +23,7 @@ namespace Function.Events
                         EventParameters = new PointsEventParameters
                         {
                             Action = action.ToLowerInvariant(),
-                            Amount = pointsPayload.Amount
+                            Amount = pointsPayload.AmountOfPoints
                         }
                     };
                 }

@@ -6,6 +6,6 @@ namespace Function.Events
 
         public string TargetPlayerId { get; set; }
 
-        public int Amount { get; set; }
+        public int AmountOfPoints { get; set; }
     }
 }

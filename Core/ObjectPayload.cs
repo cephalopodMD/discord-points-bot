@@ -1,6 +1,6 @@
 ﻿namespace PointsBot.Core
 {
-    internal class ObjectPayload
+    public class ObjectPayload
     {
         public string OriginPlayerId { get; set; }
 
