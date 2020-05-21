@@ -1,4 +1,4 @@
-namespace PointsBot.Core
+namespace PointsBot.Core.Models
 {
     public class PlayerState
     { 

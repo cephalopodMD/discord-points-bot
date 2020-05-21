@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -6,7 +5,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Microsoft.Extensions.Configuration;
-using PointsBot.Core;
+using PointsBot.Core.Commands;
+using PointsBot.Core.Models;
 
 namespace Bot.Modules
 {
@@ -57,7 +57,7 @@ namespace Bot.Modules
 
         private IEnumerable<Task> AddPoints(IUser user, int amountOfPoints) => new[]
         {
-            _sender.AddPoints(Context.User.Username, user.Username, amountOfPoints),
+            _sender.SendCommand(new AddCommand(Context.User.Username, user.Username, amountOfPoints)),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 
@@ -90,7 +90,7 @@ namespace Bot.Modules
 
         private IEnumerable<Task> RemovePoints(IUser user, int amountOfPoints) => new[]
         {
-            _sender.RemovePoints(Context.User.Username, user.Username, amountOfPoints),
+            _sender.SendCommand(new RemoveCommand(Context.User.Username, user.Username, amountOfPoints)),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 

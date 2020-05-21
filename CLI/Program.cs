@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
-using PointsBot.Core;
+using PointsBot.Core.Commands;
 
 namespace PointsBot.CLI
 {
@@ -12,24 +13,23 @@ namespace PointsBot.CLI
             .AddJsonFile("./local.appsettings.json", true, true)
             .Build();
 
-        private static async Task Main(string[] args)
+        private static Task Main(string[] args)
         {
+            var sender = new CommandSender(new QueueClient(new ServiceBusConnectionStringBuilder(_configuration["CommandServiceBusConnectionString"])));
+
+            ICommand command = null;
             switch (args[0])
             {
                 case "add":
-                {
-                    var sender = new CommandSender(_configuration["CommandServiceBusConnectionString"]);
-                    await sender.AddPoints(args[1], args[2], Int32.Parse(args[3]));
-                }
-                break;
+                    command = new AddCommand(args[1], args[2], Int32.Parse(args[3]));
+                    break;
                 case "remove":
-                {
-                    var sender = new CommandSender(_configuration["CommandServiceBusConnectionString"]);
-                    await sender.RemovePoints(args[1], args[2], Int32.Parse(args[3]));
-                } 
-                break;
-                default: break;
+                    command = new RemoveCommand(args[1], args[2], Int32.Parse(args[3]));
+                    break;
+                default: return Task.CompletedTask;
             }
+
+            return sender.SendCommand(command);
         }
     }
 }

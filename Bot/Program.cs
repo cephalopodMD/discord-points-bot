@@ -5,9 +5,10 @@ using Bot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PointsBot.Core;
+using PointsBot.Core.Commands;
 
 namespace Bot
 {
@@ -71,7 +72,9 @@ namespace Bot
                 .AddSingleton<CommandHandlingService>()
                 .AddSingleton(Configuration)
                 .AddSingleton<HttpClient>()
-                .AddSingleton(provider => new CommandSender(Configuration["ServiceBusConnectionString"]));
+                .AddSingleton<IQueueClient>(provider =>
+                    new QueueClient(Configuration["ServiceBusConnectionString"], "commands"))
+                .AddSingleton<CommandSender>();
 
             return serviceCollection.BuildServiceProvider();
         }
