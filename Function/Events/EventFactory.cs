@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json;
 
 namespace CommandsFunction.Events
@@ -16,7 +15,6 @@ namespace CommandsFunction.Events
                 case "remove":
                 {
                     var pointsPayload = JsonSerializer.Deserialize<PointsCommand>(payload.GetRawText());
-
                     return new PointsEvent
                     {
                         OriginPlayerId = pointsPayload.OriginPlayerId,

@@ -1,12 +1,9 @@
 using System;
-using System.Diagnostics.Tracing;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using CommandsFunction.Events;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace CommandsFunction
