@@ -48,10 +48,10 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints)
         {
-            if (await _pointsService.IsPlayerTimedOut(user.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
             {
                 await Context.User.SendMessageAsync(
-                    "You're doing that too much. You can only add or remove points once every couple of minutes'");
+                    "You're doing that too much. You can only add or remove points once every couple of minutes");
                 return;
             }
 
@@ -62,10 +62,10 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
-            if (await _pointsService.IsPlayerTimedOut(user.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
             {
                 await Context.User.SendMessageAsync(
-                    "You're doing that too much. You can only add or remove points once every couple of minutes'");
+                    "You're doing that too much. You can only add or remove points once every couple of minutes");
                 return;
             }
 
@@ -95,10 +95,10 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints)
         {
-            if (await _pointsService.IsPlayerTimedOut(user.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
             {
                 await Context.User.SendMessageAsync(
-                    "You're doing that too much. You can only add or remove points once every couple of minutes'");
+                    "You're doing that too much. You can only add or remove points once every couple of minutes");
                 return;
             }
 
@@ -109,10 +109,10 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
-            if (await _pointsService.IsPlayerTimedOut(user.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
             {
                 await Context.User.SendMessageAsync(
-                    "You're doing that too much. You can only add or remove points once every couple of minutes'");
+                    "You're doing that too much. You can only add or remove points once every couple of minutes");
                 return;
             }
             await Task.WhenAll(RemovePoints(user, amountOfPoints));

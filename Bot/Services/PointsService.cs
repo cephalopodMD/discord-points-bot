@@ -17,8 +17,8 @@ namespace Bot.Services
 
         public async Task<bool> IsPlayerTimedOut(string playerId)
         {
-            var httpclient = _httpClientFactory.CreateClient();
-            var playerTimedOut = await httpclient.GetAsync($"{_configuration["QueryBaseEndpoint"]}timeout/{playerId}?code={_configuration["QueryKey"]}");
+            var httpClient = _httpClientFactory.CreateClient();
+            var playerTimedOut = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}timeout/{playerId}?code={_configuration["QueryKey"]}");
 
             var timedOut = await playerTimedOut.Content.ReadAsStringAsync();
             return timedOut == "timedout";
