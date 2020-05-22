@@ -29,7 +29,7 @@ namespace CommandsFunction
 
             var newEvent = _eventsFactory(command);
             if (newEvent == null) return Task.CompletedTask;
-            if (newEvent.EventParameters.Amount > Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"])) return Task.CompletedTask;
+            if (newEvent.EventParameters.Amount <= 0 || newEvent.EventParameters.Amount > Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"])) return Task.CompletedTask;
 
             var rootKey = $"{newEvent.Root}";
             var playerKey = $"{newEvent.Root}_{newEvent.TargetPlayerId}";
