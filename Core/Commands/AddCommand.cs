@@ -13,6 +13,7 @@ namespace PointsBot.Core.Commands
 
         public string Serialize() => JsonSerializer.Serialize(_message);
 
+        // Not sure how to make this private and still work with System.Text.Json;
         public class AddPointsMessage
         {
             public AddPointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints)
