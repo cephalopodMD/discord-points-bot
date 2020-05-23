@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace CommandsFunction.Events
+namespace Function.Events
 {
     public class PointsEvent
     {

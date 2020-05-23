@@ -1,12 +1,12 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
-using CommandsFunction.Events;
+using Function.Events;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
-namespace CommandsFunction
+namespace Function
 {
     public class CommandIntake
     {
