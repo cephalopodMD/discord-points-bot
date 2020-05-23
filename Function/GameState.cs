@@ -10,9 +10,9 @@ namespace Function
 {
     public class GameState
     {
-        private readonly ConnectionMultiplexer _redis;
+        private readonly IConnectionMultiplexer _redis;
 
-        public GameState(ConnectionMultiplexer redis)
+        public GameState(IConnectionMultiplexer redis)
         {
             _redis = redis;
         }
