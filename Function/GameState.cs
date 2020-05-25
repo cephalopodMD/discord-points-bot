@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -8,79 +9,79 @@ using StackExchange.Redis;
 
 namespace Function
 {
-    public class GameState
+    public interface IEventStorage<TEvent>
+    {
+        Task<IEnumerable<TEvent>> GetEvents(string playerId);
+    }
+
+    public class RedisPointsEventStorage : IEventStorage<PointsEvent>
     {
         private readonly IConnectionMultiplexer _redis;
 
-        public GameState(IConnectionMultiplexer redis)
+        private static string PlayerKey(string playerId) => $"points_{playerId}";
+
+        public RedisPointsEventStorage(IConnectionMultiplexer redis)
         {
             _redis = redis;
         }
 
-        private readonly Dictionary<string, PlayerState> _playerStateByRedisKey =
-            new Dictionary<string, PlayerState>();
+        public async Task<IEnumerable<PointsEvent>> GetEvents(string playerId)
+        {
+            var database = _redis.GetDatabase();
 
-        private static string PlayerKey(string playerId) => $"points_{playerId}";
+            var eventListLength = await database.ListLengthAsync(PlayerKey(playerId));
+            var redisValueTasks = new List<Task<RedisValue>>();
+
+            for (long ii = 0; ii <= eventListLength; ii++)
+            {
+                redisValueTasks.Add(database.ListGetByIndexAsync(PlayerKey(playerId), ii));
+            }
+
+            var redisValues = (await Task.WhenAll(redisValueTasks)).ToList();
+            return redisValues.Select(value => JsonSerializer.Deserialize<PointsEvent>(Encoding.UTF8.GetBytes(value)));
+        }
+    }
+
+    public class GameState
+    {
+        private readonly IEventStorage<PointsEvent> _pointsEventStorage;
+
+        public GameState(IEventStorage<PointsEvent> pointsEventStorage)
+        {
+            _pointsEventStorage = pointsEventStorage;
+        }
+
         private static string PlayerTimeoutKey(string playerId) => $"points_{playerId}_timeout";
 
         public async Task<PlayerState> RefreshPlayer(string playerId)
         {
-            var database = _redis.GetDatabase();
-            var playerState = AddAndGetPlayer(playerId);
-            var playerKey = PlayerKey(playerId);
+            var events = await _pointsEventStorage.GetEvents(playerId);
 
-            var eventListLength = await database.ListLengthAsync(playerId);
-            if (playerState.NumberOfEvents == eventListLength) return playerState;
-
-            var startingIndex = playerState.NumberOfEvents;
-            var redisValueTasks = new List<Task<RedisValue>>();
-            while (startingIndex < eventListLength)
+            int amountOfPoints = 0;
+            foreach (var pointsEvent in events)
             {
-                redisValueTasks.Add(database.ListGetByIndexAsync(playerKey, startingIndex));
-                startingIndex++;
-            }
-
-            var redisValues = await Task.WhenAll(redisValueTasks);
-
-            playerState.NumberOfEvents = eventListLength;
-            foreach (var value in redisValues)
-            {
-                var parameters = JsonSerializer.Deserialize<PointsEvent>(Encoding.UTF8.GetBytes(value));
-                switch (parameters.Action)
+                switch (pointsEvent.Action)
                 {
                     case "add":
-                        playerState.TotalPoints += parameters.Amount;
+                        amountOfPoints += pointsEvent.Amount;
                         break;
                     case "remove":
-                        playerState.TotalPoints -= parameters.Amount;
+                        amountOfPoints -= pointsEvent.Amount;
                         break;
                     default: break;
                 }
             }
 
-            return playerState;
-        }
-
-        private PlayerState AddAndGetPlayer(string playerId)
-        {
-            var playerKey = PlayerKey(playerId);
-            if (_playerStateByRedisKey.ContainsKey(playerKey)) return _playerStateByRedisKey[playerKey];
-
-            AddPlayer(playerKey);
-            return _playerStateByRedisKey[playerKey];
-        }
-
-        private void AddPlayer(string playerKey)
-        {
-            _playerStateByRedisKey.Add(PlayerKey(playerKey), new PlayerState { NumberOfEvents = 0, PlayerId = playerKey, TotalPoints = 0 });
+            return new PlayerState(playerId, amountOfPoints);
         }
 
         public bool IsPlayerTimedOut(string playerId)
         {
-            var database = _redis.GetDatabase();
-            var timeoutKey = PlayerTimeoutKey(playerId);
+            return true;
+            //var database = _pointsEventStorage.GetDatabase();
+            //var timeoutKey = PlayerTimeoutKey(playerId);
 
-            return database.StringGet(timeoutKey) != RedisValue.Null;
+            //return database.StringGet(timeoutKey) != RedisValue.Null;
         }
     }
 }
