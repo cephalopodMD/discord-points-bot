@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Function.Events;
 using Function.Query;
-using Function.Redis.Redis;
+using Function.Redis;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

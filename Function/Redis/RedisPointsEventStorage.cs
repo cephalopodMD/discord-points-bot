@@ -3,12 +3,10 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Function.Command;
 using Function.Events;
-using Function.Query;
 using StackExchange.Redis;
 
-namespace Function.Redis.Redis
+namespace Function.Redis
 {
     public class RedisPointsEventStorage : IEventFeed<PointsEvent>, IEventWriter<PointsEvent>
     {
