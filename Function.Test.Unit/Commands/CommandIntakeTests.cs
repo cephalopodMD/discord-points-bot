@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Function.Commands;
@@ -7,7 +6,7 @@ using Function.Events;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Function.Test.Unit
+namespace Function.Test.Unit.Commands
 {
     [TestClass]
     public class CommandIntakeTests
@@ -36,7 +35,7 @@ namespace Function.Test.Unit
         [TestMethod]
         public async Task Run_ShortCircuits_WhenPointsAmountInPayloadIsLessThanZero()
         {
-            var mockEventFactory = new Func<JsonDocument, PointsEvent>(document => new PointsEvent{Amount = 0});
+            var mockEventFactory = new Func<JsonDocument, PointsEvent>(document => new PointsEvent {Amount = 0});
 
             var mockGameTimer = new Mock<IGameTimer>();
             mockGameTimer.Setup(timer => timer.Timeout(It.IsAny<string>())).Verifiable();
@@ -57,7 +56,7 @@ namespace Function.Test.Unit
         [TestMethod]
         public async Task Run_ShortCircuits_WhenPointsAreLargerThanConfiguredMaxAmount()
         {
-            var mockEventFactory = new Func<JsonDocument, PointsEvent>(document => new PointsEvent { Amount = 30 });
+            var mockEventFactory = new Func<JsonDocument, PointsEvent>(document => new PointsEvent {Amount = 30});
 
             var mockGameTimer = new Mock<IGameTimer>();
             mockGameTimer.Setup(timer => timer.Timeout(It.IsAny<string>())).Verifiable();
