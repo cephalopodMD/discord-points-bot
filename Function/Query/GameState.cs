@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Function.Events;
 using PointsBot.Infrastructure.Models;
@@ -16,22 +17,17 @@ namespace Function.Query
         public async Task<PlayerState> RefreshPlayer(string playerId)
         {
             var events = await _pointsEventFeed.GetEvents(playerId);
-            var amountOfPoints = 0;
-            foreach (var pointsEvent in events)
+            return events.Aggregate(new PlayerState(playerId, 0), (state, pointsEvent) =>
             {
                 switch (pointsEvent.Action)
                 {
                     case "add":
-                        amountOfPoints += pointsEvent.Amount;
-                        break;
+                        return new PlayerState(playerId, state.TotalPoints + pointsEvent.Amount);
                     case "remove":
-                        amountOfPoints -= pointsEvent.Amount;
-                        break;
-                    default: break;
+                        return new PlayerState(playerId, state.TotalPoints - pointsEvent.Amount);
+                    default: return state;
                 }
-            }
-
-            return new PlayerState(playerId, amountOfPoints);
+            });
         }
     }
 }
