@@ -1,4 +1,4 @@
-namespace Function.Command.Models
+namespace PointsBot.Infrastructure.Models
 {
     public class PointsCommand
     {

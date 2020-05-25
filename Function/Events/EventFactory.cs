@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Function.Command.Models;
+using PointsBot.Infrastructure.Models;
 
 namespace Function.Events
 {

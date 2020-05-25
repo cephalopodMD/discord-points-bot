@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using PointsBot.Infrastructure.Models;
 
 namespace PointsBot.Infrastructure.Commands
 {
@@ -18,7 +19,7 @@ namespace PointsBot.Infrastructure.Commands
         {
             public AddPointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints)
             {
-                Payload = new ObjectPayload
+                Payload = new PointsCommand
                 {
                     OriginPlayerId = originPlayerId,
                     TargetPlayerId = targetPlayerId,
@@ -28,7 +29,7 @@ namespace PointsBot.Infrastructure.Commands
 
             public string Action { get; } = "add";
 
-            public ObjectPayload Payload { get; }
+            public PointsCommand Payload { get; }
         }
     }
 }
