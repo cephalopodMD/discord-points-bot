@@ -22,6 +22,7 @@ namespace Function
             var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
 
             builder.Services.AddSingleton(ConnectionMultiplexer.Connect(configuration["RedisConnection"]));
+            builder.Services.AddSingleton<Func<int>>(() => Int32.Parse(configuration["MaxPointsPerAddOrSubtract"]));
             builder.Services.AddSingleton<IEventFeed<PointsEvent>, RedisPointsEventStorage>();
             builder.Services.AddSingleton<IEventWriter<PointsEvent>, RedisPointsEventStorage>();
             builder.Services.AddSingleton<GameState>();
