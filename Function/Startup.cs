@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json;
-using Function.Events;
+using Function.Command.Events;
+using Function.Query;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

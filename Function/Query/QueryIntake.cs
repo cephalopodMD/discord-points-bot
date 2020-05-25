@@ -5,14 +5,17 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using PointsBot.Core.Models;
 
-namespace Function
+namespace Function.Query
 {
     public class QueryIntake
     {
         private readonly GameState _gameState;
-        public QueryIntake(GameState gameState)
+        private readonly IGameTimer _gameTimer;
+
+        public QueryIntake(GameState gameState, IGameTimer gameTimer)
         {
             _gameState = gameState;
+            _gameTimer = gameTimer;
         }
 
         private static readonly Dictionary<string, PlayerState> PlayerStateByRedisKey =
@@ -31,7 +34,7 @@ namespace Function
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "timeout/{playerId}")]
             HttpRequest request, string playerId)
         {
-            return _gameState.IsPlayerTimedOut(playerId);
+            return _gameTimer.HasTimeout(playerId);
         }
     }
 }
