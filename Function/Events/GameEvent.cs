@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Function.Events
 {
-    public class PointsEvent
+    public class GameEvent
     {
         [JsonIgnore]
         public string Root => "points";
@@ -11,10 +11,10 @@ namespace Function.Events
 
         public string TargetPlayerId { get; set; }
 
-        public PointsEventParameters EventParameters { get; set; }
+        public PointsEvent PointsEvent { get; set; }
     }
 
-    public class PointsEventParameters
+    public class PointsEvent
     {
         public string Action { get; set; }
 

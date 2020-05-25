@@ -26,7 +26,7 @@ namespace Function
         public async Task<PlayerState> RefreshPlayer(string playerId)
         {
             var database = _redis.GetDatabase();
-            var playerState = GetPlayer(playerId);
+            var playerState = AddAndGetPlayer(playerId);
             var playerKey = PlayerKey(playerId);
 
             var eventListLength = await database.ListLengthAsync(playerId);
@@ -45,7 +45,7 @@ namespace Function
             playerState.NumberOfEvents = eventListLength;
             foreach (var value in redisValues)
             {
-                var parameters = JsonSerializer.Deserialize<PointsEventParameters>(Encoding.UTF8.GetBytes(value));
+                var parameters = JsonSerializer.Deserialize<PointsEvent>(Encoding.UTF8.GetBytes(value));
                 switch (parameters.Action)
                 {
                     case "add":
@@ -61,7 +61,7 @@ namespace Function
             return playerState;
         }
 
-        private PlayerState GetPlayer(string playerId)
+        private PlayerState AddAndGetPlayer(string playerId)
         {
             var playerKey = PlayerKey(playerId);
             if (_playerStateByRedisKey.ContainsKey(playerKey)) return _playerStateByRedisKey[playerKey];

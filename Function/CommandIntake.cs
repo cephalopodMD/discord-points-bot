@@ -10,11 +10,11 @@ namespace Function
 {
     public class CommandIntake
     {
-        private readonly Func<JsonDocument, PointsEvent> _eventsFactory;
+        private readonly Func<JsonDocument, GameEvent> _eventsFactory;
         private readonly ConnectionMultiplexer _redis;
         private readonly IConfiguration _configuration;
 
-        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, ConnectionMultiplexer redis, IConfiguration configuration)
+        public CommandIntake(Func<JsonDocument, GameEvent> eventsFactory, ConnectionMultiplexer redis, IConfiguration configuration)
         {
             _eventsFactory = eventsFactory;
             _redis = redis;
@@ -27,21 +27,21 @@ namespace Function
             var dataBase = _redis.GetDatabase();
             var command = JsonDocument.Parse(commandPayload);
 
-            var newEvent = _eventsFactory(command);
-            if (newEvent == null) return Task.CompletedTask;
-            if (newEvent.EventParameters.Amount <= 0 || newEvent.EventParameters.Amount > Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"])) return Task.CompletedTask;
+            var gameEvent = _eventsFactory(command);
+            if (gameEvent == null) return Task.CompletedTask;
+            if (gameEvent.PointsEvent.Amount <= 0 || gameEvent.PointsEvent.Amount > Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"])) return Task.CompletedTask;
 
-            var rootKey = $"{newEvent.Root}";
-            var playerKey = $"{newEvent.Root}_{newEvent.TargetPlayerId}";
-            var timeoutKey = $"{newEvent.Root}_{newEvent.OriginPlayerId}_timeout";
+            var rootKey = $"{gameEvent.Root}";
+            var playerKey = $"{gameEvent.Root}_{gameEvent.TargetPlayerId}";
+            var timeoutKey = $"{gameEvent.Root}_{gameEvent.OriginPlayerId}_timeout";
 
             if (dataBase.StringGet(timeoutKey) != RedisValue.Null) return Task.CompletedTask;
 
             var newEventTasks = new Task[]
             {
-                dataBase.ListRightPushAsync(rootKey, JsonSerializer.Serialize(newEvent)),
+                dataBase.ListRightPushAsync(rootKey, JsonSerializer.Serialize(gameEvent)),
                 dataBase.ListRightPushAsync(playerKey,
-                    JsonSerializer.Serialize(newEvent.EventParameters)),
+                    JsonSerializer.Serialize(gameEvent.PointsEvent)),
                 dataBase.StringSetAsync(timeoutKey, new RedisValue("--expirykey--"), TimeSpan.FromSeconds(Double.Parse(_configuration["CommandTimeoutInSeconds"])))
             };
 

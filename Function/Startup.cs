@@ -13,7 +13,7 @@ namespace Function
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddSingleton(
-                provider => new Func<JsonDocument, PointsEvent>(
+                provider => new Func<JsonDocument, GameEvent>(
                     element => new EventFactory().Create(element)
                 )
             );
