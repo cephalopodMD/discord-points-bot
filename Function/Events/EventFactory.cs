@@ -1,6 +1,7 @@
 using System.Text.Json;
+using Function.Command.Models;
 
-namespace Function.Command.Events
+namespace Function.Events
 {
     public class EventFactory
     {

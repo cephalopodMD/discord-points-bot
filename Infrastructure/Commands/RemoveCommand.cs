@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace PointsBot.Core.Commands
+namespace PointsBot.Infrastructure.Commands
 {
     public class RemoveCommand : ICommand
     {

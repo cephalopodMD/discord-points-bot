@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
-using PointsBot.Core.Commands;
+using PointsBot.Infrastructure.Commands;
 
 namespace PointsBot.CLI
 {

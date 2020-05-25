@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 
-namespace PointsBot.Core.Commands
+namespace PointsBot.Infrastructure.Commands
 {
     public class CommandSender
     {

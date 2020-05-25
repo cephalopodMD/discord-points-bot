@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Function.Query
+namespace Function
 {
     public interface IGameTimer
     {

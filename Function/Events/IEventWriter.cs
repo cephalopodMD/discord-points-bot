@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
-using Function.Command.Events;
 
-namespace Function.Query
+namespace Function.Events
 {
     public interface IEventWriter<TEvent>
     {

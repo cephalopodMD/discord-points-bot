@@ -1,9 +1,10 @@
 using System;
 using System.Threading.Tasks;
+using Function.Query;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
-namespace Function.Query.Redis
+namespace Function.Redis.Redis
 {
     public class RedisTimer : IGameTimer
     {

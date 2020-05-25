@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Function.Command.Events;
+using Function.Events;
 using Function.Query;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;

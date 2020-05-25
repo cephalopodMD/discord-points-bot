@@ -1,4 +1,4 @@
-﻿namespace PointsBot.Core.Commands
+﻿namespace PointsBot.Infrastructure.Commands
 {
     public interface ICommand
     {

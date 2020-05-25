@@ -6,8 +6,8 @@ using Bot.Services;
 using Discord;
 using Discord.Commands;
 using Microsoft.Extensions.Configuration;
-using PointsBot.Core.Commands;
-using PointsBot.Core.Models;
+using PointsBot.Infrastructure.Commands;
+using PointsBot.Infrastructure.Models;
 
 namespace Bot.Modules
 {

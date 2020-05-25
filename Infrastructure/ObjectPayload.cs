@@ -1,6 +1,6 @@
-namespace Function.Command.Events
+﻿namespace PointsBot.Infrastructure
 {
-    public class PointsCommand
+    public class ObjectPayload
     {
         public string OriginPlayerId { get; set; }
 

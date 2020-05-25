@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PointsBot.Core.Commands;
+using PointsBot.Infrastructure.Commands;
 
-namespace Core.Test.Unit
+namespace Infrastructure.Test.Unit
 {
     [TestClass]
     public class CommandSenderTests

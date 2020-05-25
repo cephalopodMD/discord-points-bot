@@ -10,7 +10,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PointsBot.Core.Commands;
+using PointsBot.Infrastructure.Commands;
 
 namespace Bot
 {

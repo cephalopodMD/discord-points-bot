@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.Json;
-using Function.Command.Events;
+using Function.Events;
 using Function.Query;
-using Function.Query.Redis;
+using Function.Redis.Redis;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

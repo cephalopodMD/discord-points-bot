@@ -1,6 +1,6 @@
-﻿namespace PointsBot.Core
+namespace Function.Command.Models
 {
-    public class ObjectPayload
+    public class PointsCommand
     {
         public string OriginPlayerId { get; set; }
 
