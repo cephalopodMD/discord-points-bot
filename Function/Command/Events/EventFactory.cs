@@ -9,26 +9,17 @@ namespace Function.Command.Events
             var action = document.RootElement.GetProperty("Action").GetString();
             var payload = document.RootElement.GetProperty("Payload");
 
-            switch (action.ToLowerInvariant())
+            var pointsPayload = JsonSerializer.Deserialize<PointsCommand>(payload.GetRawText());
+            return new GameEvent
             {
-                case "add":
-                case "remove":
+                PointsEvent = new PointsEvent
                 {
-                    var pointsPayload = JsonSerializer.Deserialize<PointsCommand>(payload.GetRawText());
-                    return new GameEvent
-                    {
-                        OriginPlayerId = pointsPayload.OriginPlayerId,
-                        TargetPlayerId = pointsPayload.TargetPlayerId,
-                        PointsEvent = new PointsEvent
-                        {
-                            Action = action.ToLowerInvariant(),
-                            Amount = pointsPayload.AmountOfPoints
-                        }
-                    };
+                    OriginPlayerId = pointsPayload.OriginPlayerId,
+                    TargetPlayerId = pointsPayload.TargetPlayerId,
+                    Action = action.ToLowerInvariant(),
+                    Amount = pointsPayload.AmountOfPoints
                 }
-                default:
-                    return null;
-            }
+            };
         }
     }
 }

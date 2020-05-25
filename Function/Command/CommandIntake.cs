@@ -32,8 +32,8 @@ namespace Function.Command
             if (gameEvent.PointsEvent.Amount <= 0 || gameEvent.PointsEvent.Amount > Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"])) return Task.CompletedTask;
 
             var rootKey = $"{gameEvent.Root}";
-            var playerKey = $"{gameEvent.Root}_{gameEvent.TargetPlayerId}";
-            var timeoutKey = $"{gameEvent.Root}_{gameEvent.OriginPlayerId}_timeout";
+            var playerKey = $"{gameEvent.Root}_{gameEvent.PointsEvent.TargetPlayerId}";
+            var timeoutKey = $"{gameEvent.Root}_{gameEvent.PointsEvent.TargetPlayerId}_timeout";
 
             if (dataBase.StringGet(timeoutKey) != RedisValue.Null) return Task.CompletedTask;
 

@@ -4,7 +4,7 @@ using PointsBot.Core.Models;
 
 namespace Function.Query
 {
-    public class GameState
+    public sealed class GameState
     {
         private readonly IEventStorage<PointsEvent> _pointsEventStorage;
 
