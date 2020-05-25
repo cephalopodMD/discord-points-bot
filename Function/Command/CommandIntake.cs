@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Function.Command.Events;
+using Function.Query;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
@@ -10,42 +11,36 @@ namespace Function.Command
 {
     public class CommandIntake
     {
-        private readonly Func<JsonDocument, GameEvent> _eventsFactory;
-        private readonly ConnectionMultiplexer _redis;
+        private readonly Func<JsonDocument, PointsEvent> _eventsFactory;
         private readonly IConfiguration _configuration;
 
-        public CommandIntake(Func<JsonDocument, GameEvent> eventsFactory, ConnectionMultiplexer redis, IConfiguration configuration)
+        private readonly IGameTimer _gameTimer;
+        private readonly IEventWriter<PointsEvent> _pointsEventWriter;
+
+        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, IConfiguration configuration, IGameTimer gameTimer, IEventWriter<PointsEvent> pointsEventWriter)
         {
             _eventsFactory = eventsFactory;
-            _redis = redis;
             _configuration = configuration;
+            _gameTimer = gameTimer;
+            _pointsEventWriter = pointsEventWriter;
         }
 
         [FunctionName("CommandIntake")]
         public Task Run([ServiceBusTrigger("commands", Connection = "PointsBotQueueConnection")]string commandPayload)
         {
-            var dataBase = _redis.GetDatabase();
             var command = JsonDocument.Parse(commandPayload);
 
-            var gameEvent = _eventsFactory(command);
-            if (gameEvent == null) return Task.CompletedTask;
-            if (gameEvent.PointsEvent.Amount <= 0 || gameEvent.PointsEvent.Amount > Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"])) return Task.CompletedTask;
+            var pointsEvent = _eventsFactory(command);
+            if (pointsEvent == null) return Task.CompletedTask;
+            if (pointsEvent.Amount <= 0 || pointsEvent.Amount > Int32.Parse(_configuration["MaxPointsPerAddOrSubtract"])) return Task.CompletedTask;
 
-            var rootKey = $"{gameEvent.Root}";
-            var playerKey = $"{gameEvent.Root}_{gameEvent.PointsEvent.TargetPlayerId}";
-            var timeoutKey = $"{gameEvent.Root}_{gameEvent.PointsEvent.TargetPlayerId}_timeout";
-
-            if (dataBase.StringGet(timeoutKey) != RedisValue.Null) return Task.CompletedTask;
-
-            var newEventTasks = new Task[]
+            var updateTasks = new[]
             {
-                dataBase.ListRightPushAsync(rootKey, JsonSerializer.Serialize(gameEvent)),
-                dataBase.ListRightPushAsync(playerKey,
-                    JsonSerializer.Serialize(gameEvent.PointsEvent)),
-                dataBase.StringSetAsync(timeoutKey, new RedisValue("--expirykey--"), TimeSpan.FromSeconds(Double.Parse(_configuration["CommandTimeoutInSeconds"])))
+                _pointsEventWriter.PushEvents(pointsEvent),
+                _gameTimer.Timeout(pointsEvent.OriginPlayerId)
             };
 
-            return Task.WhenAll(newEventTasks);
+            return Task.WhenAll(updateTasks);
         }
     }
 }

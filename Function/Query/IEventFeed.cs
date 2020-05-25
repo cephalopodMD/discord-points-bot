@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Function.Query
 {
-    public interface IEventStorage<TEvent>
+    public interface IEventFeed<TEvent>
     {
         Task<IEnumerable<TEvent>> GetEvents(string playerId);
     }

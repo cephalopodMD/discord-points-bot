@@ -1,15 +1,5 @@
-using System.Text.Json.Serialization;
-
 namespace Function.Command.Events
 {
-    public class GameEvent
-    {
-        [JsonIgnore]
-        public string Root => "points";
-
-        public PointsEvent PointsEvent { get; set; }
-    }
-
     public class PointsEvent
     {
         public string TargetPlayerId { get; set; }

@@ -4,21 +4,18 @@ namespace Function.Command.Events
 {
     public class EventFactory
     {
-        public GameEvent Create(JsonDocument document)
+        public PointsEvent Create(JsonDocument document)
         {
             var action = document.RootElement.GetProperty("Action").GetString();
             var payload = document.RootElement.GetProperty("Payload");
 
             var pointsPayload = JsonSerializer.Deserialize<PointsCommand>(payload.GetRawText());
-            return new GameEvent
+            return new PointsEvent
             {
-                PointsEvent = new PointsEvent
-                {
-                    OriginPlayerId = pointsPayload.OriginPlayerId,
-                    TargetPlayerId = pointsPayload.TargetPlayerId,
-                    Action = action.ToLowerInvariant(),
-                    Amount = pointsPayload.AmountOfPoints
-                }
+                OriginPlayerId = pointsPayload.OriginPlayerId,
+                TargetPlayerId = pointsPayload.TargetPlayerId,
+                Action = action.ToLowerInvariant(),
+                Amount = pointsPayload.AmountOfPoints
             };
         }
     }

@@ -8,7 +8,7 @@ using StackExchange.Redis;
 
 namespace Function.Query.Redis
 {
-    public class RedisPointsEventStorage : IEventStorage<PointsEvent>
+    public class RedisPointsEventStorage : IEventFeed<PointsEvent>, IEventWriter<PointsEvent>
     {
         private readonly IConnectionMultiplexer _redis;
 
@@ -33,6 +33,15 @@ namespace Function.Query.Redis
 
             var redisValues = (await Task.WhenAll(redisValueTasks)).ToList();
             return redisValues.Select(value => JsonSerializer.Deserialize<PointsEvent>(Encoding.UTF8.GetBytes(value)));
+        }
+
+        public Task PushEvents(PointsEvent pointsEvent)
+        {
+            var dataBase = _redis.GetDatabase();
+            return Task.WhenAll(
+                dataBase.ListRightPushAsync("points", JsonSerializer.Serialize(pointsEvent)), 
+                dataBase.ListRightPushAsync(PlayerKey(pointsEvent.TargetPlayerId),
+                JsonSerializer.Serialize(pointsEvent)));
         }
     }
 }

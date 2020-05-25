@@ -6,16 +6,16 @@ namespace Function.Query
 {
     public sealed class GameState
     {
-        private readonly IEventStorage<PointsEvent> _pointsEventStorage;
+        private readonly IEventFeed<PointsEvent> _pointsEventFeed;
 
-        public GameState(IEventStorage<PointsEvent> pointsEventStorage)
+        public GameState(IEventFeed<PointsEvent> pointsEventFeed)
         {
-            _pointsEventStorage = pointsEventStorage;
+            _pointsEventFeed = pointsEventFeed;
         }
 
         public async Task<PlayerState> RefreshPlayer(string playerId)
         {
-            var events = await _pointsEventStorage.GetEvents(playerId);
+            var events = await _pointsEventFeed.GetEvents(playerId);
             var amountOfPoints = 0;
             foreach (var pointsEvent in events)
             {
