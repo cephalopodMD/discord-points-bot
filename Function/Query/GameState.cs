@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Function.Events;
+using PointsBot.Core;
 using PointsBot.Infrastructure.Models;
 
 namespace Function.Query

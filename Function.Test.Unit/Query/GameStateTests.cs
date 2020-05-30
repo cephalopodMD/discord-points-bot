@@ -5,6 +5,7 @@ using Function.Events;
 using Function.Query;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using PointsBot.Core;
 
 namespace Function.Test.Unit.Query
 {

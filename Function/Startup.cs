@@ -6,6 +6,7 @@ using Function.Redis;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PointsBot.Core;
 using StackExchange.Redis;
 
 namespace Function

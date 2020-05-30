@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Function.Events
+namespace PointsBot.Core
 {
     public interface IEventWriter<TEvent>
     {

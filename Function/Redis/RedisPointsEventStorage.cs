@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Function.Events;
+using PointsBot.Core;
 using StackExchange.Redis;
 
 namespace Function.Redis

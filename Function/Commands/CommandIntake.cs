@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Function.Events;
 using Microsoft.Azure.WebJobs;
+using PointsBot.Core;
 
 namespace Function.Commands
 {

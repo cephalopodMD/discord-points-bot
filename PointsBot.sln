@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Test.Unit", "Infrastructure.Test.Unit\Infrastructure.Test.Unit.csproj", "{6FC1D984-229C-415E-989A-BF68AE6F556D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Function.Test.Unit", "Function.Test.Unit\Function.Test.Unit.csproj", "{FE6B971E-8628-4E9C-AB08-0394F04299BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Function.Test.Unit", "Function.Test.Unit\Function.Test.Unit.csproj", "{FE6B971E-8628-4E9C-AB08-0394F04299BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{DC8068EE-3F67-47EA-9CB5-42F14EB3F43E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{FE6B971E-8628-4E9C-AB08-0394F04299BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE6B971E-8628-4E9C-AB08-0394F04299BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE6B971E-8628-4E9C-AB08-0394F04299BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC8068EE-3F67-47EA-9CB5-42F14EB3F43E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC8068EE-3F67-47EA-9CB5-42F14EB3F43E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC8068EE-3F67-47EA-9CB5-42F14EB3F43E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC8068EE-3F67-47EA-9CB5-42F14EB3F43E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

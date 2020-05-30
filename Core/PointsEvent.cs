@@ -1,4 +1,4 @@
-namespace Function.Events
+namespace PointsBot.Core
 {
     public class PointsEvent
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Function.Events
+namespace PointsBot.Core
 {
     public interface IEventFeed<TEvent>
     {
