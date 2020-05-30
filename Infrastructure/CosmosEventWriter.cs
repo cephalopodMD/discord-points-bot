@@ -19,7 +19,7 @@ namespace PointsBot.Infrastructure
             return container.CreateItemAsync(new CosmosItem
             {
                 id = Guid.NewGuid().ToString(),
-                server = "CustomServer",
+                source = pointsEvent.Source,
                 Event = pointsEvent
             });
         }
@@ -28,7 +28,7 @@ namespace PointsBot.Infrastructure
         {
             public string id { get; set; }
 
-            public string server { get; set; }
+            public string source { get; set; }
 
             public PointsEvent Event { get; set; }
         }

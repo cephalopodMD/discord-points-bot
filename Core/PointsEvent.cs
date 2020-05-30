@@ -9,5 +9,7 @@ namespace PointsBot.Core
         public int Amount { get; set; }
 
         public string OriginPlayerId { get; set; }
+
+        public string Source { get; set; }
     }
 }
