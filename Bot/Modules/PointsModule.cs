@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Bot.Services;
 using Discord;
 using Discord.Commands;
+using Microsoft.Azure.Amqp.Framing;
 using Microsoft.Extensions.Configuration;
 using PointsBot.Infrastructure.Commands;
 using PointsBot.Infrastructure.Models;
@@ -22,6 +23,8 @@ namespace Bot.Modules
         {
             PropertyNameCaseInsensitive = true
         };
+
+        private static string Source(ulong guildId) => $"discord/{guildId}";
 
         public PointsModule(CommandSender sender, IHttpClientFactory httpClientFactory, IConfiguration configuration, PointsService pointsService)
         {
@@ -74,7 +77,7 @@ namespace Bot.Modules
 
         private IEnumerable<Task> AddPoints(IUser user, int amountOfPoints) => new[]
         {
-            _sender.SendCommand(new AddCommand(Context.User.Username, user.Username, amountOfPoints)),
+            _sender.SendCommand(new AddCommand(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id))),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 
@@ -120,7 +123,7 @@ namespace Bot.Modules
 
         private IEnumerable<Task> RemovePoints(IUser user, int amountOfPoints) => new[]
         {
-            _sender.SendCommand(new RemoveCommand(Context.User.Username, user.Username, amountOfPoints)),
+            _sender.SendCommand(new RemoveCommand(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id))),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 

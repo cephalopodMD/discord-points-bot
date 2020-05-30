@@ -7,9 +7,9 @@ namespace PointsBot.Infrastructure.Commands
     {
         private readonly RemovePointsMessage _message;
 
-        public RemoveCommand(string originPlayer, string targetPlayerId, int amountOfPoints)
+        public RemoveCommand(string originPlayer, string targetPlayerId, int amountOfPoints, string source)
         {
-            _message = new RemovePointsMessage(originPlayer, targetPlayerId, amountOfPoints);
+            _message = new RemovePointsMessage(originPlayer, targetPlayerId, amountOfPoints, source);
         }
 
         public string Serialize() => JsonSerializer.Serialize(_message);
@@ -17,8 +17,9 @@ namespace PointsBot.Infrastructure.Commands
         // Not sure how to make this private and still work with System.Text.Json;
         public class RemovePointsMessage
         {
-            public RemovePointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints)
+            public RemovePointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints, string source)
             {
+                Source = source;
                 Payload = new PointsCommand
                 {
                     OriginPlayerId = originPlayerId,
@@ -28,6 +29,8 @@ namespace PointsBot.Infrastructure.Commands
             }
 
             public string Action { get; } = "remove";
+
+            public string Source { get; }
 
             public PointsCommand Payload { get; set; }
         }

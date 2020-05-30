@@ -7,9 +7,9 @@ namespace PointsBot.Infrastructure.Commands
     {
         private readonly AddPointsMessage _message;
 
-        public AddCommand(string originPlayer, string targetPlayerId, int amountOfPoints)
+        public AddCommand(string originPlayer, string targetPlayerId, int amountOfPoints, string source)
         {
-            _message = new AddPointsMessage(originPlayer, targetPlayerId, amountOfPoints);
+            _message = new AddPointsMessage(originPlayer, targetPlayerId, amountOfPoints, source);
         }
 
         public string Serialize() => JsonSerializer.Serialize(_message);
@@ -17,8 +17,9 @@ namespace PointsBot.Infrastructure.Commands
         // Not sure how to make this private and still work with System.Text.Json;
         public class AddPointsMessage
         {
-            public AddPointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints)
+            public AddPointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints, string source)
             {
+                Source = source;
                 Payload = new PointsCommand
                 {
                     OriginPlayerId = originPlayerId,
@@ -28,6 +29,8 @@ namespace PointsBot.Infrastructure.Commands
             }
 
             public string Action { get; } = "add";
+
+            public string Source { get; }
 
             public PointsCommand Payload { get; }
         }
