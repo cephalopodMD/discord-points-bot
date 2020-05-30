@@ -7,11 +7,11 @@ namespace Function.Redis
 {
     public class RedisTimer : IGameTimer
     {
-        private readonly IConnectionMultiplexer _redis;
+        private readonly ConnectionMultiplexer _redis;
         private readonly IConfiguration _configuration;
 
         private static string TimeoutKey(string playerId) => $"points_{playerId}_timeout";
-        public RedisTimer(IConnectionMultiplexer redis, IConfiguration configuration)
+        public RedisTimer(ConnectionMultiplexer redis, IConfiguration configuration)
         {
             _redis = redis;
             _configuration = configuration;
