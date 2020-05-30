@@ -7,6 +7,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PointsBot.Core;
+using PointsBot.Infrastructure;
 using StackExchange.Redis;
 
 namespace Function
@@ -25,7 +26,8 @@ namespace Function
             builder.Services.AddSingleton(ConnectionMultiplexer.Connect(configuration["RedisConnection"]));
             builder.Services.AddSingleton<Func<int>>(() => Int32.Parse(configuration["MaxPointsPerAddOrSubtract"]));
             builder.Services.AddSingleton<IEventFeed<PointsEvent>, RedisPointsEventStorage>();
-            builder.Services.AddSingleton<IEventWriter<PointsEvent>, RedisPointsEventStorage>();
+            builder.Services.AddSingleton<IEventWriter<PointsEvent>, CosmosEventWriter>();
+            builder.Services.AddSingleton<IGameTimer, RedisTimer>();
             builder.Services.AddSingleton<GameState>();
         }
     }
