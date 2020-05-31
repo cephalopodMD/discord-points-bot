@@ -66,6 +66,14 @@ namespace Bot.Services
             if (result.IsSuccess)
                 return;
 
+            if (result.Error == CommandError.Exception &&
+                result.ErrorReason.Contains("'<' is an invalid start of a value",
+                    StringComparison.InvariantCultureIgnoreCase))
+            {
+                await context.Channel.SendMessageAsync($"It seems like my creator has forgotten to turn me on...");
+                return;
+            }
+
             // the command failed, let's notify the user that something happened.
             await context.Channel.SendMessageAsync($"error: {result}");
         }
