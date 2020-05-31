@@ -17,19 +17,14 @@ namespace PointsBot.CLI
         {
             var sender = new CommandSender(new QueueClient(new ServiceBusConnectionStringBuilder(Configuration["CommandServiceBusConnectionString"])));
 
-            ICommand command;
             switch (args[0])
             {
                 case "add":
-                    command = new AddCommand(args[1], args[2], Int32.Parse(args[3]), "CLI");
-                    break;
+                    return sender.SendAdd(args[1], args[2], Int32.Parse(args[3]), "CLI");
                 case "remove":
-                    command = new RemoveCommand(args[1], args[2], Int32.Parse(args[3]), "CLI");
-                    break;
+                    return sender.SendRemove(args[1], args[2], Int32.Parse(args[3]), "CLI");
                 default: return Task.CompletedTask;
             }
-
-            return sender.SendCommand(command);
         }
     }
 }

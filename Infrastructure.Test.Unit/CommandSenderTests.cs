@@ -11,21 +11,27 @@ namespace Infrastructure.Test.Unit
     public class CommandSenderTests
     {
         [TestMethod]
-        public async Task SendCommand_CallsSendAsync_WithMessage()
+        public async Task SendAdd_CallsSendAsync_WithMessage()
         {
-            const string testMessage = "test";
-            var testMessageBytes = Encoding.UTF8.GetBytes(testMessage);
-
             var mockQueueClient = new Mock<IQueueClient>();
             mockQueueClient.Setup(queue => queue.SendAsync(It.IsAny<Message>()));
 
-            var mockCommand = new Mock<ICommand>();
-            mockCommand.Setup(command => command.Serialize()).Returns(testMessage);
+            var structureUnderTest = new CommandSender(mockQueueClient.Object);
+            await structureUnderTest.SendAdd("somePlayerId", "someTarget", 0, "Test");
+
+            mockQueueClient.Verify(client => client.SendAsync(It.IsAny<Message>()));
+        }
+
+        [TestMethod]
+        public async Task SendRemove_CallsSendAsync_WithMessage()
+        {
+            var mockQueueClient = new Mock<IQueueClient>();
+            mockQueueClient.Setup(queue => queue.SendAsync(It.IsAny<Message>()));
 
             var structureUnderTest = new CommandSender(mockQueueClient.Object);
-            await structureUnderTest.SendCommand(mockCommand.Object);
+            await structureUnderTest.SendRemove("somePlayerId", "someTarget", 0, "Test");
 
-            mockQueueClient.Verify(client => client.SendAsync(It.Is<Message>(message => message.Body.Length == testMessageBytes.Length)));
+            mockQueueClient.Verify(client => client.SendAsync(It.IsAny<Message>()));
         }
     }
 }

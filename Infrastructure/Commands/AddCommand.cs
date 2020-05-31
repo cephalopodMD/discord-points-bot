@@ -1,38 +1,26 @@
 ﻿using System.Text.Json;
+using System.Windows.Input;
 using PointsBot.Infrastructure.Models;
 
 namespace PointsBot.Infrastructure.Commands
 {
-    public class AddCommand : ICommand
+    internal class AddCommand 
     {
-        private readonly AddPointsMessage _message;
+        public string Action { get; } = "add";
 
-        public AddCommand(string originPlayer, string targetPlayerId, int amountOfPoints, string source)
+        public string Source { get; }
+
+        public PointsCommand Payload { get; }
+
+        public AddCommand(string originPlayerId, string targetPlayerId, int amountOfPoints, string source)
         {
-            _message = new AddPointsMessage(originPlayer, targetPlayerId, amountOfPoints, source);
-        }
-
-        public string Serialize() => JsonSerializer.Serialize(_message);
-
-        // Not sure how to make this private and still work with System.Text.Json;
-        public class AddPointsMessage
-        {
-            public AddPointsMessage(string originPlayerId, string targetPlayerId, int amountOfPoints, string source)
+            Source = source;
+            Payload = new PointsCommand
             {
-                Source = source;
-                Payload = new PointsCommand
-                {
-                    OriginPlayerId = originPlayerId,
-                    TargetPlayerId = targetPlayerId,
-                    AmountOfPoints = amountOfPoints
-                };
-            }
-
-            public string Action { get; } = "add";
-
-            public string Source { get; }
-
-            public PointsCommand Payload { get; }
+                OriginPlayerId = originPlayerId,
+                TargetPlayerId = targetPlayerId,
+                AmountOfPoints = amountOfPoints
+            };
         }
     }
 }

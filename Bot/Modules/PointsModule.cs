@@ -77,7 +77,7 @@ namespace Bot.Modules
 
         private IEnumerable<Task> AddPoints(IUser user, int amountOfPoints) => new[]
         {
-            _sender.SendCommand(new AddCommand(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id))),
+            _sender.SendAdd(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id)),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 
@@ -123,7 +123,7 @@ namespace Bot.Modules
 
         private IEnumerable<Task> RemovePoints(IUser user, int amountOfPoints) => new[]
         {
-            _sender.SendCommand(new RemoveCommand(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id))),
+            _sender.SendRemove(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id)),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 
