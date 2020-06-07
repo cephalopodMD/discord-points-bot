@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Function.Events;
@@ -61,25 +62,50 @@ namespace Function.Commands
                 if (!playerPointsByName.TryGetValue(pointsEvent.TargetPlayerId, out var playerPoints))
                 {
                     var retrieveAction =
-                        TableOperation.Retrieve<PlayerPoints>(pointsEvent.Source, pointsEvent.OriginPlayerId);
+                        TableOperation.Retrieve<PlayerPoints>(pointsEvent.Source, pointsEvent.TargetPlayerId);
                     var playerPointsResult = await pointsTable.ExecuteAsync(retrieveAction);
+
+                    if (playerPointsResult.HttpStatusCode >= 500)
+                    {
+                        throw new WebException(
+                            $"Error getting player (Source: {pointsEvent.Source}, Player: {pointsEvent.TargetPlayerId}  : {playerPointsResult.Result} ",
+                            WebExceptionStatus.UnknownError);
+                    }
 
                     if (playerPointsResult.HttpStatusCode == 404)
                     {
-                        var newPlayer = new PlayerPoints
+                        playerPoints = new PlayerPoints
                             {PartitionKey = pointsEvent.Source, RowKey = pointsEvent.TargetPlayerId, TotalPoints = 0};
 
-                        var addAction = TableOperation.Insert(newPlayer);
-                        await pointsTable.ExecuteAsync(addAction);
+                        var addAction = TableOperation.Insert(playerPoints);
+                        var addResult = await pointsTable.ExecuteAsync(addAction);
 
-                        playerPointsByName.Add(pointsEvent.TargetPlayerId, newPlayer);
+                        if (addResult.HttpStatusCode >= 500)
+                        {
+                            throw new WebException($"Error adding new player to storage account: {addResult.Result} ",
+                                WebExceptionStatus.UnknownError);
+                        }
+
+                        playerPointsByName.Add(pointsEvent.TargetPlayerId, playerPoints);
                     }
-
-                    playerPoints = playerPointsByName[pointsEvent.TargetPlayerId];
+                    else
+                    {
+                        playerPoints = (PlayerPoints)playerPointsResult.Result;
+                        playerPointsByName.Add(pointsEvent.TargetPlayerId, playerPoints);
+                    }
                 }
 
                 if (pointsEvent.Action == "add") playerPoints.TotalPoints += pointsEvent.Amount;
                 else if (pointsEvent.Action == "remove") playerPoints.TotalPoints -= pointsEvent.Amount;
+
+                var mergeAction = TableOperation.Merge(playerPoints);
+                var mergeResult = await pointsTable.ExecuteAsync(mergeAction);
+
+                if (mergeResult.HttpStatusCode >= 500)
+                {
+                    throw new WebException($"Error updating player (Source: {pointsEvent.Source}, Player: {pointsEvent.TargetPlayerId}  : {mergeResult.Result} ",
+                        WebExceptionStatus.UnknownError);
+                }
             }
         }
     }
