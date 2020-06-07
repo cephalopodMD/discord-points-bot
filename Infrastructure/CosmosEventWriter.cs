@@ -8,6 +8,8 @@ namespace PointsBot.Infrastructure
     public class CosmosEventWriter : IEventWriter<PointsEvent>
     {
         private readonly CosmosClient _client;
+        private const string DatabaseName = "points_bot";
+        private const string ContainerName = "points_events_monitored";
 
         public CosmosEventWriter(CosmosClient client)
         {
@@ -16,8 +18,8 @@ namespace PointsBot.Infrastructure
 
         public Task PushEvents(PointsEvent pointsEvent)
         {
-            var database = _client.GetDatabase("points_bot");
-            var container = database.GetContainer("points_events_monitored");
+            var database = _client.GetDatabase(DatabaseName);
+            var container = database.GetContainer(ContainerName);
 
             return container.CreateItemAsync(new CosmosItem
             {

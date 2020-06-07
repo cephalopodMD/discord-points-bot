@@ -15,6 +15,7 @@ namespace Function.Events
             var pointsPayload = JsonSerializer.Deserialize<PointsCommand>(payload.GetRawText());
             return new PointsEvent
             {
+                Source = source,
                 OriginPlayerId = pointsPayload.OriginPlayerId,
                 TargetPlayerId = pointsPayload.TargetPlayerId,
                 Action = action.ToLowerInvariant(),
