@@ -109,9 +109,4 @@ namespace Function.Commands
             }
         }
     }
-
-    public class PlayerPoints : TableEntity
-    {
-        public int TotalPoints { get; set; }
-    }
 }
