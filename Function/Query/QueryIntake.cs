@@ -12,12 +12,10 @@ namespace Function.Query
 {
     public class QueryIntake
     {
-        private readonly GameState _gameState;
         private readonly IGameTimer _gameTimer;
 
-        public QueryIntake(GameState gameState, IGameTimer gameTimer)
+        public QueryIntake(IGameTimer gameTimer)
         {
-            _gameState = gameState;
             _gameTimer = gameTimer;
         }
 
