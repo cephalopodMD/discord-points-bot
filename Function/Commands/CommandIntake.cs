@@ -61,8 +61,9 @@ namespace Function.Commands
             {
                 var splitId = change.Id.Split('_');
 
-                var source = splitId[0];
-                var targetPlayerId = splitId[1];
+                if (splitId.Length != 3) throw new Exception("Document Id is malformed.");
+                var source = $"{splitId[0]}_{splitId[1]}";
+                var targetPlayerId = splitId[2];
 
                 if (playerPointsByName.TryGetValue(targetPlayerId, out var playerPoints)) continue;
 
@@ -84,7 +85,7 @@ namespace Function.Commands
                         PartitionKey = source,
                         RowKey = targetPlayerId,
                         TotalPoints = 0,
-                        LastEventIndex = 0
+                        LastEventIndex = -1
                     };
 
                     var addAction = TableOperation.Insert(playerPoints);
@@ -106,12 +107,13 @@ namespace Function.Commands
                 }
 
                 var pointsEvents = change.GetPropertyValue<IEnumerable<PointsEvent>>("Events").ToList();
-                if (pointsEvents.Count == playerPoints.LastEventIndex - 1) continue;
+                if (pointsEvents.Count == playerPoints.LastEventIndex) continue;
 
-                int eventIndex = playerPoints.LastEventIndex + 1;
+                var eventIndex = playerPoints.LastEventIndex + 1;
                 do
                 {
                     var pointsEvent = pointsEvents[eventIndex];
+
                     if (pointsEvent.Action == "add") playerPoints.TotalPoints += pointsEvent.Amount;
                     else if (pointsEvent.Action == "remove") playerPoints.TotalPoints -= pointsEvent.Amount;
 
@@ -119,7 +121,7 @@ namespace Function.Commands
 
                 } while (eventIndex < pointsEvents.Count);
 
-                playerPoints.LastEventIndex = eventIndex;
+                playerPoints.LastEventIndex = eventIndex - 1;
 
                 var mergeAction = TableOperation.Merge(playerPoints);
                 var mergeResult = await pointsTable.ExecuteAsync(mergeAction);

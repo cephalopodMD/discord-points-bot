@@ -51,7 +51,7 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints)
         {
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
                     "You're doing that too much. You can only add or remove points once every couple of minutes");
@@ -65,7 +65,7 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
                     "You're doing that too much. You can only add or remove points once every couple of minutes");
@@ -98,7 +98,7 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints)
         {
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
                     "You're doing that too much. You can only add or remove points once every couple of minutes");
@@ -112,7 +112,7 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
                     "You're doing that too much. You can only add or remove points once every couple of minutes");

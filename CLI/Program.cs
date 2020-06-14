@@ -35,10 +35,10 @@ namespace PointsBot.CLI
             switch (command)
             {
                 case "add":
-                    await sender.SendAdd(args[1], args[2], Int32.Parse(args[3]), "CLI");
+                    await sender.SendAdd(args[1], args[2], Int32.Parse(args[3]), "CLI_home");
                     break;
                 case "remove":
-                    await sender.SendRemove(args[1], args[2], Int32.Parse(args[3]), "CLI");
+                    await sender.SendRemove(args[1], args[2], Int32.Parse(args[3]), "CLI_home");
                     break;
                 case "dumpredis":
                     await DumpRedis();

@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -15,13 +16,13 @@ namespace Bot.Services
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<bool> IsPlayerTimedOut(string playerId)
+        public async Task<bool> IsPlayerTimedOut(string playerId, string source)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var playerTimedOut = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}timeout/{playerId}?code={_configuration["QueryKey"]}");
+            var playerTimedOut = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}timeout/{source}/{playerId}?code={_configuration["QueryKey"]}");
 
             var timedOut = await playerTimedOut.Content.ReadAsStringAsync();
-            return timedOut == "timedout";
+            return Boolean.Parse(timedOut);
         }
     }
 }

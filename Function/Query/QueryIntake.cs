@@ -29,11 +29,15 @@ namespace Function.Query
             var queryAction = TableOperation.Retrieve<PlayerPoints>(source, playerId);
             var queryResult = await pointsTable.ExecuteAsync(queryAction);
 
-            if (queryResult.HttpStatusCode == 404) return PlayerState.Unknown;
+            if (queryResult.HttpStatusCode == 404) return new PlayerState();
             if (queryResult.HttpStatusCode >= 500) throw new WebException($"Error when querying for player ({playerId}): {queryResult.Result}");
 
             var playerPoints = (PlayerPoints) queryResult.Result;
-            return new PlayerState(playerPoints.PlayerName, playerPoints.TotalPoints);
+            return new PlayerState
+            {
+                PlayerId = playerPoints.PlayerName,
+                TotalPoints = playerPoints.TotalPoints
+            };
         }
 
         [FunctionName("GetTimeout")]
