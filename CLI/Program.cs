@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,11 +19,20 @@ namespace PointsBot.CLI
             .AddJsonFile("./local.appsettings.json", true, true)
             .Build();
 
-        private static async Task Main(string[] args)
+        private static async Task<int> Main(string[] args)
         {
+            var command = args[0];
+            Console.WriteLine(args[0]);
+
+            if (command == "postbuild")
+            {
+                PostBuild.Execute(args[1]);
+                return 0;
+            }
+
             var sender = new CommandSender(new QueueClient(new ServiceBusConnectionStringBuilder(Configuration["CommandServiceBusConnectionString"])));
 
-            switch (args[0])
+            switch (command)
             {
                 case "add":
                     await sender.SendAdd(args[1], args[2], Int32.Parse(args[3]), "CLI");
@@ -35,8 +43,10 @@ namespace PointsBot.CLI
                 case "dumpredis":
                     await DumpRedis();
                     break;
-                default: return;
+                default: return 0;
             }
+
+            return 0;
         }
 
         private static async Task DumpRedis()

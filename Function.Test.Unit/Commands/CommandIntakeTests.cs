@@ -13,12 +13,12 @@ namespace Function.Test.Unit.Commands
     public class CommandIntakeTests
     {
         [TestMethod]
-        public async Task Run_ShortCircuits_WhenEventFactoryReturnsNull()
+        public async Task InterpretCommand_ShortCircuits_WhenEventFactoryReturnsNull()
         {
             var mockEventFactory = new Func<JsonDocument, PointsEvent>(document => null);
 
             var mockGameTimer = new Mock<IGameTimer>();
-            mockGameTimer.Setup(timer => timer.Timeout(It.IsAny<string>())).Verifiable();
+            mockGameTimer.Setup(timer => timer.Timeout(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
 
             var mockEventWriter = new Mock<IEventWriter<PointsEvent>>();
             mockEventWriter.Setup(writer => writer.PushEvents(It.IsAny<PointsEvent>())).Verifiable();
@@ -27,9 +27,9 @@ namespace Function.Test.Unit.Commands
                 new CommandIntake(mockEventFactory, () => 1, mockGameTimer.Object, mockEventWriter.Object);
 
             const string CommandPayload = "{}";
-            await structureUnderTest.Run(CommandPayload);
+            await structureUnderTest.InterpretCommand(CommandPayload);
 
-            mockGameTimer.Verify(timer => timer.Timeout(It.IsAny<string>()), Times.Never);
+            mockGameTimer.Verify(timer => timer.Timeout(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             mockEventWriter.Verify(writer => writer.PushEvents(It.IsAny<PointsEvent>()), Times.Never);
         }
 
@@ -39,7 +39,7 @@ namespace Function.Test.Unit.Commands
             var mockEventFactory = new Func<JsonDocument, PointsEvent>(document => new PointsEvent {Amount = 0});
 
             var mockGameTimer = new Mock<IGameTimer>();
-            mockGameTimer.Setup(timer => timer.Timeout(It.IsAny<string>())).Verifiable();
+            mockGameTimer.Setup(timer => timer.Timeout(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
 
             var mockEventWriter = new Mock<IEventWriter<PointsEvent>>();
             mockEventWriter.Setup(writer => writer.PushEvents(It.IsAny<PointsEvent>())).Verifiable();
@@ -48,9 +48,9 @@ namespace Function.Test.Unit.Commands
                 new CommandIntake(mockEventFactory, () => 1, mockGameTimer.Object, mockEventWriter.Object);
 
             const string CommandPayload = "{}";
-            await structureUnderTest.Run(CommandPayload);
+            await structureUnderTest.InterpretCommand(CommandPayload);
 
-            mockGameTimer.Verify(timer => timer.Timeout(It.IsAny<string>()), Times.Never);
+            mockGameTimer.Verify(timer => timer.Timeout(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             mockEventWriter.Verify(writer => writer.PushEvents(It.IsAny<PointsEvent>()), Times.Never);
         }
 
@@ -60,7 +60,7 @@ namespace Function.Test.Unit.Commands
             var mockEventFactory = new Func<JsonDocument, PointsEvent>(document => new PointsEvent {Amount = 30});
 
             var mockGameTimer = new Mock<IGameTimer>();
-            mockGameTimer.Setup(timer => timer.Timeout(It.IsAny<string>())).Verifiable();
+            mockGameTimer.Setup(timer => timer.Timeout(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
 
             var mockEventWriter = new Mock<IEventWriter<PointsEvent>>();
             mockEventWriter.Setup(writer => writer.PushEvents(It.IsAny<PointsEvent>())).Verifiable();
@@ -69,9 +69,9 @@ namespace Function.Test.Unit.Commands
                 new CommandIntake(mockEventFactory, () => 20, mockGameTimer.Object, mockEventWriter.Object);
 
             const string CommandPayload = "{}";
-            await structureUnderTest.Run(CommandPayload);
+            await structureUnderTest.InterpretCommand(CommandPayload);
 
-            mockGameTimer.Verify(timer => timer.Timeout(It.IsAny<string>()), Times.Never);
+            mockGameTimer.Verify(timer => timer.Timeout(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             mockEventWriter.Verify(writer => writer.PushEvents(It.IsAny<PointsEvent>()), Times.Never);
         }
 
@@ -88,7 +88,7 @@ namespace Function.Test.Unit.Commands
             var mockEventFactory = new Func<JsonDocument, PointsEvent>(document => pointsEvent);
 
             var mockGameTimer = new Mock<IGameTimer>();
-            mockGameTimer.Setup(timer => timer.Timeout(pointsEvent.OriginPlayerId)).Verifiable();
+            mockGameTimer.Setup(timer => timer.Timeout(pointsEvent.OriginPlayerId, It.IsAny<string>())).Verifiable();
 
             var mockEventWriter = new Mock<IEventWriter<PointsEvent>>();
             mockEventWriter.Setup(writer => writer.PushEvents(pointsEvent)).Verifiable();
@@ -97,9 +97,9 @@ namespace Function.Test.Unit.Commands
                 new CommandIntake(mockEventFactory, () => 20, mockGameTimer.Object, mockEventWriter.Object);
 
             const string CommandPayload = "{}";
-            await structureUnderTest.Run(CommandPayload);
+            await structureUnderTest.InterpretCommand(CommandPayload);
 
-            mockGameTimer.Verify(timer => timer.Timeout(pointsEvent.OriginPlayerId), Times.Once);
+            mockGameTimer.Verify(timer => timer.Timeout(pointsEvent.OriginPlayerId, It.IsAny<string>()), Times.Once);
             mockEventWriter.Verify(writer => writer.PushEvents(pointsEvent), Times.Once);
         }
     }

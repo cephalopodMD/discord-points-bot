@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace Function.Commands
             var updateTasks = new[]
             {
                 _pointsEventWriter.PushEvents(pointsEvent),
-                _gameTimer.Timeout(pointsEvent.OriginPlayerId)
+                _gameTimer.Timeout(pointsEvent.OriginPlayerId, pointsEvent.Source)
             };
 
             return Task.WhenAll(updateTasks);
@@ -48,7 +49,7 @@ namespace Function.Commands
         [FunctionName("ChangeFeedProcessor")]
         [StorageAccount("PointsReadModelConnectionString")]
         public async Task ProcessChangeFeed(
-            [CosmosDBTrigger("points_bot", "points_events_monitored", CreateLeaseCollectionIfNotExists = true, ConnectionStringSetting = "EventFeedConnectionString")]
+            [CosmosDBTrigger("points_bot", "points_events_monitored", CreateLeaseCollectionIfNotExists = true, ConnectionStringSetting = "CosmosConnectionString")]
             IReadOnlyList<Document> changes,
             [Table("points")] CloudTable pointsTable
         )
@@ -58,52 +59,74 @@ namespace Function.Commands
             var playerPointsByName = new Dictionary<string, PlayerPoints>();
             foreach (var change in changes)
             {
-                var pointsEvent = change.GetPropertyValue<PointsEvent>("Event");
-                if (!playerPointsByName.TryGetValue(pointsEvent.TargetPlayerId, out var playerPoints))
-                {
-                    var retrieveAction =
-                        TableOperation.Retrieve<PlayerPoints>(pointsEvent.Source, pointsEvent.TargetPlayerId);
-                    var playerPointsResult = await pointsTable.ExecuteAsync(retrieveAction);
+                var splitId = change.Id.Split('_');
 
-                    if (playerPointsResult.HttpStatusCode >= 500)
+                var source = splitId[0];
+                var targetPlayerId = splitId[1];
+
+                if (playerPointsByName.TryGetValue(targetPlayerId, out var playerPoints)) continue;
+
+                var retrieveAction =
+                    TableOperation.Retrieve<PlayerPoints>(source, targetPlayerId);
+                var playerPointsResult = await pointsTable.ExecuteAsync(retrieveAction);
+
+                if (playerPointsResult.HttpStatusCode >= 500)
+                {
+                    throw new WebException(
+                        $"Error getting player (Source: {source}, Player: {targetPlayerId}  : {playerPointsResult.Result} ",
+                        WebExceptionStatus.UnknownError);
+                }
+
+                if (playerPointsResult.HttpStatusCode == 404)
+                {
+                    playerPoints = new PlayerPoints
+                    {
+                        PartitionKey = source,
+                        RowKey = targetPlayerId,
+                        TotalPoints = 0,
+                        LastEventIndex = 0
+                    };
+
+                    var addAction = TableOperation.Insert(playerPoints);
+                    var addResult = await pointsTable.ExecuteAsync(addAction);
+
+                    if (addResult.HttpStatusCode >= 500)
                     {
                         throw new WebException(
-                            $"Error getting player (Source: {pointsEvent.Source}, Player: {pointsEvent.TargetPlayerId}  : {playerPointsResult.Result} ",
+                            $"Error adding new player to storage account: {addResult.Result} ",
                             WebExceptionStatus.UnknownError);
                     }
 
-                    if (playerPointsResult.HttpStatusCode == 404)
-                    {
-                        playerPoints = new PlayerPoints
-                            {PartitionKey = pointsEvent.Source, RowKey = pointsEvent.TargetPlayerId, TotalPoints = 0};
-
-                        var addAction = TableOperation.Insert(playerPoints);
-                        var addResult = await pointsTable.ExecuteAsync(addAction);
-
-                        if (addResult.HttpStatusCode >= 500)
-                        {
-                            throw new WebException($"Error adding new player to storage account: {addResult.Result} ",
-                                WebExceptionStatus.UnknownError);
-                        }
-
-                        playerPointsByName.Add(pointsEvent.TargetPlayerId, playerPoints);
-                    }
-                    else
-                    {
-                        playerPoints = (PlayerPoints)playerPointsResult.Result;
-                        playerPointsByName.Add(pointsEvent.TargetPlayerId, playerPoints);
-                    }
+                    playerPointsByName.Add(targetPlayerId, playerPoints);
+                }
+                else
+                {
+                    playerPoints = (PlayerPoints)playerPointsResult.Result;
+                    playerPointsByName.Add(targetPlayerId, playerPoints);
                 }
 
-                if (pointsEvent.Action == "add") playerPoints.TotalPoints += pointsEvent.Amount;
-                else if (pointsEvent.Action == "remove") playerPoints.TotalPoints -= pointsEvent.Amount;
+                var pointsEvents = change.GetPropertyValue<IEnumerable<PointsEvent>>("Events").ToList();
+                if (pointsEvents.Count == playerPoints.LastEventIndex - 1) continue;
+
+                int eventIndex = playerPoints.LastEventIndex + 1;
+                do
+                {
+                    var pointsEvent = pointsEvents[eventIndex];
+                    if (pointsEvent.Action == "add") playerPoints.TotalPoints += pointsEvent.Amount;
+                    else if (pointsEvent.Action == "remove") playerPoints.TotalPoints -= pointsEvent.Amount;
+
+                    eventIndex++;
+
+                } while (eventIndex < pointsEvents.Count);
+
+                playerPoints.LastEventIndex = eventIndex;
 
                 var mergeAction = TableOperation.Merge(playerPoints);
                 var mergeResult = await pointsTable.ExecuteAsync(mergeAction);
 
                 if (mergeResult.HttpStatusCode >= 500)
                 {
-                    throw new WebException($"Error updating player (Source: {pointsEvent.Source}, Player: {pointsEvent.TargetPlayerId}  : {mergeResult.Result} ",
+                    throw new WebException($"Error updating player (Source: {source}, Player: {targetPlayerId}  : {mergeResult.Result} ",
                         WebExceptionStatus.UnknownError);
                 }
             }

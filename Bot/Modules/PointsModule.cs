@@ -24,7 +24,7 @@ namespace Bot.Modules
             PropertyNameCaseInsensitive = true
         };
 
-        private static string Source(ulong guildId) => $"discord/{guildId}";
+        private static string Source(ulong guildId) => $"discord_{guildId}";
 
         public PointsModule(CommandSender sender, IHttpClientFactory httpClientFactory, IConfiguration configuration, PointsService pointsService)
         {
@@ -131,7 +131,7 @@ namespace Bot.Modules
         public async Task GetTotalForUser(IGuildUser user)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{user.Username}?code={_configuration["QueryKey"]}");
+            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Source(Context.Guild.Id)}/{user.Username}?code={_configuration["QueryKey"]}");
             var playerState =
                 JsonSerializer.Deserialize<PlayerState>(await playerPointsResult.Content.ReadAsStringAsync(), JsonOptions);
 
@@ -142,7 +142,7 @@ namespace Bot.Modules
         public async Task GetTotalForUser()
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Context.User.Username}?code={_configuration["QueryKey"]}");
+            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Source(Context.Guild.Id)}/{Context.User.Username}?code={_configuration["QueryKey"]}");
             var playerState =
                 JsonSerializer.Deserialize<PlayerState>(await playerPointsResult.Content.ReadAsStringAsync(), JsonOptions);
 

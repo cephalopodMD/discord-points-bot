@@ -11,21 +11,22 @@ namespace Function.Redis
         private readonly IConfiguration _configuration;
 
         private static string TimeoutKey(string playerId) => $"points_{playerId}_timeout";
+
         public RedisTimer(ConnectionMultiplexer redis, IConfiguration configuration)
         {
             _redis = redis;
             _configuration = configuration;
         }
 
-        public bool HasTimeout(string playerId)
+        public Task<bool> HasTimeout(string playerId, string source)
         {
             var database = _redis.GetDatabase();
 
             var timeoutKey = TimeoutKey(playerId);
-            return database.StringGet(timeoutKey) != RedisValue.Null;
+            return Task.FromResult(database.StringGet(timeoutKey) != RedisValue.Null);
         }
 
-        public Task Timeout(string playerId)
+        public Task Timeout(string playerId, string source)
         {
             var database = _redis.GetDatabase();
 

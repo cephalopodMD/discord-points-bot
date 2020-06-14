@@ -9,5 +9,7 @@ namespace Function
         public string PlayerName => this.RowKey;
 
         public int TotalPoints { get; set; }
+
+        public int LastEventIndex { get; set; }
     }
 }

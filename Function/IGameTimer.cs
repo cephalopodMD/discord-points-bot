@@ -4,8 +4,8 @@ namespace Function
 {
     public interface IGameTimer
     {
-        bool HasTimeout(string playerId);
+        Task<bool> HasTimeout(string playerId, string source);
 
-        Task Timeout(string playerId);
+        Task Timeout(string playerId, string source);
     }
 }

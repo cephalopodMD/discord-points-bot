@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Function\Function.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Query\" />
+  </ItemGroup>
+
 </Project>

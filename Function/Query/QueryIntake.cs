@@ -37,11 +37,11 @@ namespace Function.Query
         }
 
         [FunctionName("GetTimeout")]
-        public async Task<object> GetPlayerTimeout(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "timeout/{playerId}")]
-            HttpRequest request, string playerId)
+        public Task<bool> GetPlayerTimeout(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "timeout/{source}/{playerId}")]
+            HttpRequest request, string playerId, string source)
         {
-            return _gameTimer.HasTimeout(playerId);
+            return _gameTimer.HasTimeout(playerId, source);
         }
     }
 }

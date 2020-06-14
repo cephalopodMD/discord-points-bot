@@ -29,7 +29,7 @@ namespace Function
             builder.Services.AddSingleton<IEventFeed<PointsEvent>, RedisPointsEventStorage>();
             builder.Services.AddSingleton(new CosmosClient(configuration["CosmosConnectionString"]));
             builder.Services.AddSingleton<IEventWriter<PointsEvent>, CosmosEventWriter>();
-            builder.Services.AddSingleton<IGameTimer, RedisTimer>();
+            builder.Services.AddSingleton<IGameTimer, CosmosTimer>();
         }
     }
 }
