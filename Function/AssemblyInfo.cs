@@ -1,3 +1,4 @@
-﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+﻿using Function;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 
-[assembly: FunctionsStartup(typeof(CommandsFunction.Startup))]
+[assembly: FunctionsStartup(typeof(Startup))]

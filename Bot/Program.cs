@@ -10,18 +10,10 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PointsBot.Core.Commands;
+using PointsBot.Infrastructure.Commands;
 
 namespace Bot
 {
-    // This is a minimal example of using Discord.Net's command
-    // framework - by no means does it show everything the framework
-    // is capable of.
-    //
-    // You can find samples of using the command framework:
-    // - Here, under the 02_commands_framework sample
-    // - https://github.com/foxbot/DiscordBotBase - a bare-bones bot template
-    // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
     class Program
     {
         public static async Task Main()

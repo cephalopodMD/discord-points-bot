@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using Bot.Services;
 using Discord;
 using Discord.Commands;
+using Microsoft.Azure.Amqp.Framing;
 using Microsoft.Extensions.Configuration;
-using PointsBot.Core.Commands;
-using PointsBot.Core.Models;
+using PointsBot.Infrastructure.Commands;
+using PointsBot.Infrastructure.Models;
 
 namespace Bot.Modules
 {
@@ -22,6 +23,8 @@ namespace Bot.Modules
         {
             PropertyNameCaseInsensitive = true
         };
+
+        private static string Source(ulong guildId) => $"discord_{guildId}";
 
         public PointsModule(CommandSender sender, IHttpClientFactory httpClientFactory, IConfiguration configuration, PointsService pointsService)
         {
@@ -48,7 +51,7 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints)
         {
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
                     "You're doing that too much. You can only add or remove points once every couple of minutes");
@@ -62,7 +65,7 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
                     "You're doing that too much. You can only add or remove points once every couple of minutes");
@@ -74,7 +77,7 @@ namespace Bot.Modules
 
         private IEnumerable<Task> AddPoints(IUser user, int amountOfPoints) => new[]
         {
-            _sender.SendCommand(new AddCommand(Context.User.Username, user.Username, amountOfPoints)),
+            _sender.SendAdd(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id)),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 
@@ -95,7 +98,7 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints)
         {
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
                     "You're doing that too much. You can only add or remove points once every couple of minutes");
@@ -109,7 +112,7 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username))
+            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
                     "You're doing that too much. You can only add or remove points once every couple of minutes");
@@ -120,7 +123,7 @@ namespace Bot.Modules
 
         private IEnumerable<Task> RemovePoints(IUser user, int amountOfPoints) => new[]
         {
-            _sender.SendCommand(new RemoveCommand(Context.User.Username, user.Username, amountOfPoints)),
+            _sender.SendRemove(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id)),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 
@@ -128,7 +131,7 @@ namespace Bot.Modules
         public async Task GetTotalForUser(IGuildUser user)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{user.Username}?code={_configuration["QueryKey"]}");
+            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Source(Context.Guild.Id)}/{user.Username}?code={_configuration["QueryKey"]}");
             var playerState =
                 JsonSerializer.Deserialize<PlayerState>(await playerPointsResult.Content.ReadAsStringAsync(), JsonOptions);
 
@@ -139,7 +142,7 @@ namespace Bot.Modules
         public async Task GetTotalForUser()
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Context.User.Username}?code={_configuration["QueryKey"]}");
+            var playerPointsResult = await httpClient.GetAsync($"{_configuration["QueryBaseEndpoint"]}points/{Source(Context.Guild.Id)}/{Context.User.Username}?code={_configuration["QueryKey"]}");
             var playerState =
                 JsonSerializer.Deserialize<PlayerState>(await playerPointsResult.Content.ReadAsStringAsync(), JsonOptions);
 
