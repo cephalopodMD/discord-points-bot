@@ -29,7 +29,7 @@ namespace Bot.Services
 
         public async Task InitializeAsync()
         {
-            _commands.AddTypeReader<int>(new Int32TypeReader());
+            _commands.AddTypeReader<int>(new Int32TypeReader(), true);
             // Register modules that are public and inherit ModuleBase<T>.
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
@@ -73,7 +73,6 @@ namespace Bot.Services
 
         private static bool HtmlInQueryResponse(IResult result)
         {
-            
             return result.Error == CommandError.Exception &&
                 result.ErrorReason.Contains(
                     "'<' is an invalid start of a value",
