@@ -68,6 +68,7 @@ namespace Bot.Modules
         };
 
         [Command("give")]
+        [RequireContext(ContextType.Guild)]
         public async Task GiveWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try '@PBot give @{user.Username} 420'");
 
         [Command("give")]
