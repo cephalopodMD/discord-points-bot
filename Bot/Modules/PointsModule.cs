@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -34,9 +35,16 @@ namespace Bot.Modules
             _pointsService = pointsService;
         }
 
+        private static Boolean PlayerTargetingSelf(IUser source, IUser target) => source.Username.Equals(target.Username, StringComparison.InvariantCultureIgnoreCase);
+
         [Command("give")]
         public async Task GiveWithNoAmount(IGuildUser user)
         {
+            if (PlayerTargetingSelf(Context.User, user))
+            {
+                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
+                return;
+            }
             await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try '@PBot give @{user.Username} 420'");
         }
 
@@ -44,6 +52,12 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, string amountOfPoints)
         {
+            if (PlayerTargetingSelf(Context.User, user))
+            {
+                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
+                return;
+            }
+
             await Context.Channel.SendMessageAsync($"Give only accepts numbers");
         }
 
@@ -51,6 +65,12 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints)
         {
+            if (PlayerTargetingSelf(Context.User, user))
+            {
+                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
+                return;
+            }
+
             if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
@@ -65,6 +85,12 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
+            if (PlayerTargetingSelf(Context.User, user))
+            {
+                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
+                return;
+            }
+
             if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
@@ -84,6 +110,12 @@ namespace Bot.Modules
         [Command("take")]
         public async Task TakeWithNoAmount(IGuildUser user)
         {
+            if (PlayerTargetingSelf(Context.User, user))
+            {
+                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
+                return;
+            }
+
             await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try '@PBot give @{user.Username} 69'");
         }
 
@@ -91,6 +123,12 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, string amountOfPoints)
         {
+            if (PlayerTargetingSelf(Context.User, user))
+            {
+                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
+                return;
+            }
+
             await Context.Channel.SendMessageAsync($"take only accepts numbers");
         }
 
@@ -98,6 +136,12 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints)
         {
+            if (PlayerTargetingSelf(Context.User, user))
+            {
+                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
+                return;
+            }
+
             if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
@@ -112,6 +156,12 @@ namespace Bot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
         {
+            if (PlayerTargetingSelf(Context.User, user))
+            {
+                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
+                return;
+            }
+
             if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
