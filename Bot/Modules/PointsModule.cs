@@ -69,11 +69,11 @@ namespace Bot.Modules
 
         [Command("give")]
         [RequireContext(ContextType.Guild)]
-        public async Task GiveWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try '@PBot give @{user.Username} 420'");
+        public async Task GiveWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try `@PBot give @{user.Mention} 420`");
 
         [Command("give")]
         [RequireContext(ContextType.Guild)]
-        public async Task GivePoints(IGuildUser user, string amountOfPoints) => await Context.Channel.SendMessageAsync($"Give only accepts numbers");
+        public async Task GivePoints(IGuildUser user, string amountOfPoints) => await Context.Channel.SendMessageAsync($"`give` only accepts numbers. Maybe some day we give and take words...");
 
         [Command("give")]
         [RequireContext(ContextType.Guild)]
@@ -84,11 +84,11 @@ namespace Bot.Modules
         public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest) => await TrySendCommand(user, () => AddPoints(user, amountOfPoints));
 
         [Command("take")]
-        public async Task TakeWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try '@PBot give @{user.Username} 69'");
+        public async Task TakeWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try `@PBot take @{user.Mention} 69`");
 
         [Command("take")]
         [RequireContext(ContextType.Guild)]
-        public async Task TakePoints(IGuildUser user, string amountOfPoints) => await Context.Channel.SendMessageAsync($"take only accepts numbers");
+        public async Task TakePoints(IGuildUser user, string amountOfPoints) => await Context.Channel.SendMessageAsync($"`take` only accepts numbers. . Maybe some day we give and take words...");
 
         [Command("take")]
         [RequireContext(ContextType.Guild)]
