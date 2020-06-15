@@ -37,138 +37,22 @@ namespace Bot.Modules
 
         private static Boolean PlayerTargetingSelf(IUser source, IUser target) => source.Username.Equals(target.Username, StringComparison.InvariantCultureIgnoreCase);
 
-        [Command("give")]
-        public async Task GiveWithNoAmount(IGuildUser user)
+        private async Task TrySendCommand(IUser user, Func<IEnumerable<Task>> commandsToSend)
         {
-            if (PlayerTargetingSelf(Context.User, user))
-            {
-                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
-                return;
-            }
-            await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try '@PBot give @{user.Username} 420'");
-        }
-
-        [Command("give")]
-        [RequireContext(ContextType.Guild)]
-        public async Task GivePoints(IGuildUser user, string amountOfPoints)
-        {
-            if (PlayerTargetingSelf(Context.User, user))
-            {
-                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
-                return;
-            }
-
-            await Context.Channel.SendMessageAsync($"Give only accepts numbers");
-        }
-
-        [Command("give")]
-        [RequireContext(ContextType.Guild)]
-        public async Task GivePoints(IGuildUser user, int amountOfPoints)
-        {
-            if (PlayerTargetingSelf(Context.User, user))
-            {
-                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
-                return;
-            }
-
             if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
             {
                 await Context.User.SendMessageAsync(
-                    "You're doing that too much. You can only add or remove points once every couple of minutes");
+                    "You're doing that too much. You can only add or remove points once an hour. I should probably tell you that because TECHNICALLY I know exactly when you're going to timeout. However my creator has neglected to see value in such a thing until just this moment...huh.......weird.");
                 return;
             }
 
-            await Task.WhenAll(AddPoints(user, amountOfPoints));
-        }
-
-        [Command("give")]
-        [RequireContext(ContextType.Guild)]
-        public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
-        {
             if (PlayerTargetingSelf(Context.User, user))
             {
                 await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
                 return;
             }
 
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
-            {
-                await Context.User.SendMessageAsync(
-                    "You're doing that too much. You can only add or remove points once every couple of minutes");
-                return;
-            }
-
-            await Task.WhenAll(AddPoints(user, amountOfPoints));
-        }
-
-        private IEnumerable<Task> AddPoints(IUser user, int amountOfPoints) => new[]
-        {
-            _sender.SendAdd(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id)),
-            Context.Channel.SendMessageAsync("Transaction complete.")
-        };
-
-        [Command("take")]
-        public async Task TakeWithNoAmount(IGuildUser user)
-        {
-            if (PlayerTargetingSelf(Context.User, user))
-            {
-                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
-                return;
-            }
-
-            await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try '@PBot give @{user.Username} 69'");
-        }
-
-        [Command("give")]
-        [RequireContext(ContextType.Guild)]
-        public async Task TakePoints(IGuildUser user, string amountOfPoints)
-        {
-            if (PlayerTargetingSelf(Context.User, user))
-            {
-                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
-                return;
-            }
-
-            await Context.Channel.SendMessageAsync($"take only accepts numbers");
-        }
-
-        [Command("take")]
-        [RequireContext(ContextType.Guild)]
-        public async Task TakePoints(IGuildUser user, int amountOfPoints)
-        {
-            if (PlayerTargetingSelf(Context.User, user))
-            {
-                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
-                return;
-            }
-
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
-            {
-                await Context.User.SendMessageAsync(
-                    "You're doing that too much. You can only add or remove points once every couple of minutes");
-                return;
-            }
-
-            await Task.WhenAll(RemovePoints(user, amountOfPoints));
-        }
-
-        [Command("take")]
-        [RequireContext(ContextType.Guild)]
-        public async Task TakePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest)
-        {
-            if (PlayerTargetingSelf(Context.User, user))
-            {
-                await Context.User.SendMessageAsync("You can't `give` or `take` from yourself. It's just a game...'");
-                return;
-            }
-
-            if (await _pointsService.IsPlayerTimedOut(Context.User.Username, Source(Context.Guild.Id)))
-            {
-                await Context.User.SendMessageAsync(
-                    "You're doing that too much. You can only add or remove points once every couple of minutes");
-                return;
-            }
-            await Task.WhenAll(RemovePoints(user, amountOfPoints));
+            await Task.WhenAll(commandsToSend());
         }
 
         private IEnumerable<Task> RemovePoints(IUser user, int amountOfPoints) => new[]
@@ -176,6 +60,42 @@ namespace Bot.Modules
             _sender.SendRemove(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id)),
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
+
+        private IEnumerable<Task> AddPoints(IUser user, int amountOfPoints) => new[]
+        {
+            _sender.SendAdd(Context.User.Username, user.Username, amountOfPoints, Source(Context.Guild.Id)),
+            Context.Channel.SendMessageAsync("Transaction complete.")
+        };
+
+        [Command("give")]
+        public async Task GiveWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try '@PBot give @{user.Username} 420'");
+
+        [Command("give")]
+        [RequireContext(ContextType.Guild)]
+        public async Task GivePoints(IGuildUser user, string amountOfPoints) => await Context.Channel.SendMessageAsync($"Give only accepts numbers");
+
+        [Command("give")]
+        [RequireContext(ContextType.Guild)]
+        public async Task GivePoints(IGuildUser user, int amountOfPoints) => await TrySendCommand(user, () => AddPoints(user, amountOfPoints));
+
+        [Command("give")]
+        [RequireContext(ContextType.Guild)]
+        public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest) => await TrySendCommand(user, () => AddPoints(user, amountOfPoints));
+
+        [Command("take")]
+        public async Task TakeWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try '@PBot give @{user.Username} 69'");
+
+        [Command("take")]
+        [RequireContext(ContextType.Guild)]
+        public async Task TakePoints(IGuildUser user, string amountOfPoints) => await Context.Channel.SendMessageAsync($"take only accepts numbers");
+
+        [Command("take")]
+        [RequireContext(ContextType.Guild)]
+        public async Task TakePoints(IGuildUser user, int amountOfPoints) => await TrySendCommand(user, () => RemovePoints(user, amountOfPoints));
+
+        [Command("take")]
+        [RequireContext(ContextType.Guild)]
+        public async Task TakePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest) => await TrySendCommand(user, () => RemovePoints(user, amountOfPoints));
 
         [Command("bank")]
         public async Task GetTotalForUser(IGuildUser user)
