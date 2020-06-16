@@ -11,7 +11,7 @@ namespace Bot
             if (Int32.TryParse(input, out var result)) return Task.FromResult(TypeReaderResult.FromSuccess(result));
 
             return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
-                "Amount must be a number less than 2^32-1"));
+                "I don't know how to read that number, look how big it. Definitely larger than 32 bits..."));
         }
     }
 }

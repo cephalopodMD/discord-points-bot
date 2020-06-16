@@ -35,7 +35,7 @@ namespace Bot.Modules
             _pointsService = pointsService;
         }
 
-        private static Boolean PlayerTargetingSelf(IUser source, IUser target) => source.Username.Equals(target.Username, StringComparison.InvariantCultureIgnoreCase);
+        private static bool PlayerTargetingSelf(IUser source, IUser target) => source.Username.Equals(target.Username, StringComparison.InvariantCultureIgnoreCase);
 
         private async Task TrySendCommand(IUser user, Func<IEnumerable<Task>> commandsToSend)
         {
