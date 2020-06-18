@@ -128,8 +128,7 @@ namespace Bot.Modules
                 $"If you want to see how many points you currently have try mentioning me and saying `bank`. \r\n " +
                 $"If you want to see the total of another player go ahead and mention me like @PBot `bank` {@Context.User.Mention}. \r\n\r\n" +
                 $"You can only give or take an amount of points from a player every hour! Make it count!! \r\n" +
-                $"You cannot give or take negative points or more points than 1000. In these cases I will straight up lie to you." +
-                $"I will tell you your transaction is complete, but you will be locked out for an hour :). Follow the rules ;)");
+                $"You cannot give or take negative points or more points than 1000.");
         }
     }
 }
