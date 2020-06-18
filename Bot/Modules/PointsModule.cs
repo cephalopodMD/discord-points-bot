@@ -69,7 +69,7 @@ namespace Bot.Modules
 
         [Command("give")]
         [RequireContext(ContextType.Guild)]
-        public async Task GiveWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try `@PBot give @{user.Mention} 420`");
+        public async Task GiveWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try @PBot give {user.Mention} 420");
 
         [Command("give")]
         [RequireContext(ContextType.Guild)]
@@ -84,7 +84,7 @@ namespace Bot.Modules
         public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest) => await TrySendCommand(user, () => AddPoints(user, amountOfPoints));
 
         [Command("take")]
-        public async Task TakeWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try `@PBot take @{user.Mention} 69`");
+        public async Task TakeWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try @PBot take {user.Mention} 69");
 
         [Command("take")]
         [RequireContext(ContextType.Guild)]
