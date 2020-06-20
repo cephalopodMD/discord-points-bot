@@ -24,7 +24,7 @@ namespace Function.Test.Unit.Commands
             mockEventWriter.Setup(writer => writer.PushEvents(It.IsAny<PointsEvent>())).Verifiable();
 
             var structureUnderTest =
-                new CommandIntake(mockEventFactory, () => 1, mockGameTimer.Object, mockEventWriter.Object);
+                new CommandIntake(mockEventFactory, () => 1, mockGameTimer.Object, mockEventWriter.Object, null);
 
             const string CommandPayload = "{}";
             await structureUnderTest.InterpretCommand(CommandPayload);
@@ -45,7 +45,7 @@ namespace Function.Test.Unit.Commands
             mockEventWriter.Setup(writer => writer.PushEvents(It.IsAny<PointsEvent>())).Verifiable();
 
             var structureUnderTest =
-                new CommandIntake(mockEventFactory, () => 1, mockGameTimer.Object, mockEventWriter.Object);
+                new CommandIntake(mockEventFactory, () => 1, mockGameTimer.Object, mockEventWriter.Object, null);
 
             const string CommandPayload = "{}";
             await structureUnderTest.InterpretCommand(CommandPayload);
@@ -66,7 +66,7 @@ namespace Function.Test.Unit.Commands
             mockEventWriter.Setup(writer => writer.PushEvents(It.IsAny<PointsEvent>())).Verifiable();
 
             var structureUnderTest =
-                new CommandIntake(mockEventFactory, () => 20, mockGameTimer.Object, mockEventWriter.Object);
+                new CommandIntake(mockEventFactory, () => 20, mockGameTimer.Object, mockEventWriter.Object, null);
 
             const string CommandPayload = "{}";
             await structureUnderTest.InterpretCommand(CommandPayload);
@@ -94,7 +94,7 @@ namespace Function.Test.Unit.Commands
             mockEventWriter.Setup(writer => writer.PushEvents(pointsEvent)).Verifiable();
 
             var structureUnderTest =
-                new CommandIntake(mockEventFactory, () => 20, mockGameTimer.Object, mockEventWriter.Object);
+                new CommandIntake(mockEventFactory, () => 20, mockGameTimer.Object, mockEventWriter.Object, null);
 
             const string CommandPayload = "{}";
             await structureUnderTest.InterpretCommand(CommandPayload);

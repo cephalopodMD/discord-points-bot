@@ -19,13 +19,15 @@ namespace Function.Commands
         private readonly IGameTimer _gameTimer;
         private readonly IEventWriter<PointsEvent> _pointsEventWriter;
         private readonly Func<int> _maxPointsPerAction;
+        private readonly PlayerCache _playerCache;
 
-        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, Func<int> maxPointsPerAction, IGameTimer gameTimer, IEventWriter<PointsEvent> pointsEventWriter)
+        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, Func<int> maxPointsPerAction, IGameTimer gameTimer, IEventWriter<PointsEvent> pointsEventWriter, PlayerCache playerCache)
         {
             _eventsFactory = eventsFactory;
             _maxPointsPerAction = maxPointsPerAction;
             _gameTimer = gameTimer;
             _pointsEventWriter = pointsEventWriter;
+            _playerCache = playerCache;
         }
         
         [FunctionName("CommandIntake")]
@@ -56,55 +58,11 @@ namespace Function.Commands
         {
             if (changes.Count <= 0) return;
 
-            var playerPointsByName = new Dictionary<string, PlayerPoints>();
+            var updatedPlayers = new List<PlayerPoints>();
             foreach (var change in changes)
             {
-                var splitId = change.Id.Split('_');
-
-                if (splitId.Length != 3) throw new Exception("Document Id is malformed.");
-                var source = $"{splitId[0]}_{splitId[1]}";
-                var targetPlayerId = splitId[2];
-
-                if (playerPointsByName.TryGetValue(targetPlayerId, out var playerPoints)) continue;
-
-                var retrieveAction =
-                    TableOperation.Retrieve<PlayerPoints>(source, targetPlayerId);
-                var playerPointsResult = await pointsTable.ExecuteAsync(retrieveAction);
-
-                if (playerPointsResult.HttpStatusCode >= 500)
-                {
-                    throw new WebException(
-                        $"Error getting player (Source: {source}, Player: {targetPlayerId}  : {playerPointsResult.Result} ",
-                        WebExceptionStatus.UnknownError);
-                }
-
-                if (playerPointsResult.HttpStatusCode == 404)
-                {
-                    playerPoints = new PlayerPoints
-                    {
-                        PartitionKey = source,
-                        RowKey = targetPlayerId,
-                        TotalPoints = 0,
-                        LastEventIndex = -1
-                    };
-
-                    var addAction = TableOperation.Insert(playerPoints);
-                    var addResult = await pointsTable.ExecuteAsync(addAction);
-
-                    if (addResult.HttpStatusCode >= 500)
-                    {
-                        throw new WebException(
-                            $"Error adding new player to storage account: {addResult.Result} ",
-                            WebExceptionStatus.UnknownError);
-                    }
-
-                    playerPointsByName.Add(targetPlayerId, playerPoints);
-                }
-                else
-                {
-                    playerPoints = (PlayerPoints)playerPointsResult.Result;
-                    playerPointsByName.Add(targetPlayerId, playerPoints);
-                }
+                var playerId = ParseId(change.Id);
+                var playerPoints = await  _playerCache.GetPlayer(pointsTable, playerId);
 
                 var pointsEvents = change.GetPropertyValue<IEnumerable<PointsEvent>>("Events").ToList();
                 if (pointsEvents.Count == playerPoints.LastEventIndex) continue;
@@ -120,7 +78,6 @@ namespace Function.Commands
                     eventIndex++;
 
                 } while (eventIndex < pointsEvents.Count);
-
                 playerPoints.LastEventIndex = eventIndex - 1;
 
                 var mergeAction = TableOperation.Merge(playerPoints);
@@ -128,10 +85,25 @@ namespace Function.Commands
 
                 if (mergeResult.HttpStatusCode >= 500)
                 {
-                    throw new WebException($"Error updating player (Source: {source}, Player: {targetPlayerId}  : {mergeResult.Result} ",
+                    throw new WebException($"Error updating player (Player: {playerId}  : {mergeResult.Result} ",
                         WebExceptionStatus.UnknownError);
                 }
+
+                updatedPlayers.Add(playerPoints);
             }
+
+            _playerCache.UpdatePlayer(updatedPlayers);
+        }
+
+        private static string ParseId(string documentId)
+        {
+            var splitId = documentId.Split('_');
+
+            if (splitId.Length != 3) throw new Exception("Document Id is malformed.");
+            var source = $"{splitId[0]}_{splitId[1]}";
+            var targetPlayerId = splitId[2];
+
+            return $"{source}_{targetPlayerId}";
         }
     }
 }

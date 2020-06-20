@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Function
+namespace PointsBot.Core
 {
     public interface IGameTimer
     {
