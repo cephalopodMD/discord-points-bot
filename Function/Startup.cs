@@ -20,7 +20,7 @@ namespace Function
     {
         private const string CosmosDatabaseName = "points_bot";
 
-        private static CosmosClientOptions _cosmosClientOptions = new CosmosClientOptions
+        private static readonly CosmosClientOptions CosmosClientOptions = new CosmosClientOptions
         {
             ApplicationName = "PBot",
             ConsistencyLevel = ConsistencyLevel.ConsistentPrefix
@@ -38,7 +38,7 @@ namespace Function
             builder.Services.AddSingleton<Func<int>>(() => Int32.Parse(configuration["MaxPointsPerAddOrSubtract"]));
             builder.Services.AddSingleton<Func<string, Task<Container>>>(async containerName =>
             {
-                var client = new CosmosClient(configuration["CosmosConnectionString"], _cosmosClientOptions);
+                var client = new CosmosClient(configuration["CosmosConnectionString"], CosmosClientOptions);
 
                 var databaseResponse = await client.CreateDatabaseAsync(CosmosDatabaseName);
                 var containerResponse = await databaseResponse.Database.CreateContainerAsync(new ContainerProperties(),

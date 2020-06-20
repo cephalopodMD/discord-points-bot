@@ -62,7 +62,7 @@ namespace Function.Commands
             foreach (var change in changes)
             {
                 var playerId = ParseId(change.Id);
-                var playerPoints = await  _playerCache.GetPlayer(pointsTable, playerId);
+                var playerPoints = await _playerCache.GetPlayer(pointsTable, playerId);
 
                 var pointsEvents = change.GetPropertyValue<IEnumerable<PointsEvent>>("Events").ToList();
                 if (pointsEvents.Count == playerPoints.LastEventIndex) continue;

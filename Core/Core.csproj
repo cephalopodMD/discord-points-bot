@@ -5,4 +5,8 @@
     <RootNamespace>PointsBot.Core</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.10.1" />
+  </ItemGroup>
+
 </Project>
