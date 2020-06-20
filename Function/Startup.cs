@@ -54,7 +54,7 @@ namespace Function
 
             builder.Services.AddOptions<IOptions<TimeoutOptions>>()
                 .Bind(configuration.GetSection("Timeout"));
-            builder.Services.AddOptions<IOptions<TimeoutOptions>>()
+            builder.Services.AddOptions<IOptions<EventFeedOptions>>()
                 .Bind(configuration.GetSection("EventFeed"));
 
             builder.Services.AddSingleton(

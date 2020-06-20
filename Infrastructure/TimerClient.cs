@@ -7,12 +7,12 @@ using PointsBot.Core;
 
 namespace PointsBot.Infrastructure
 {
-    internal class CosmosTimerClient : ICosmosTimerClient
+    internal class TimerClient : ICosmosTimerClient
     {
         private readonly Func<string, Container> _containerFactory;
         private readonly TimeoutOptions _timeout;
 
-        public CosmosTimerClient(Func<string, Container> containerFactory, TimeoutOptions timeout)
+        public TimerClient(Func<string, Container> containerFactory, TimeoutOptions timeout)
         {
             _containerFactory = containerFactory;
             _timeout = timeout;
