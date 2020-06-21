@@ -34,26 +34,29 @@ namespace Function
             var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
 
             builder.Services.AddSingleton<Func<int>>(() => Int32.Parse(configuration["MaxPointsPerAddOrSubtract"]));
-            builder.Services.AddSingleton<Func<string, Task<Container>>>(async containerName =>
+            builder.Services.AddSingleton(new CosmosClient(configuration["CosmosConnectionString"],
+                CosmosClientOptions));
+            builder.Services.AddSingleton<Func<string, Container>>(serviceProvider =>
             {
-                var client = new CosmosClient(configuration["CosmosConnectionString"], CosmosClientOptions);
-
-                var databaseResponse = await client.CreateDatabaseAsync(CosmosDatabaseName);
-                var containerResponse = await databaseResponse.Database.CreateContainerAsync(new ContainerProperties(),
-                    ThroughputProperties.CreateAutoscaleThroughput(400));
-
-                return containerResponse.Container;
+                var client = serviceProvider.GetService<CosmosClient>();
+                return (containerName) =>
+                {
+                    var database = client.GetDatabase(CosmosDatabaseName);
+                    return database.GetContainer(containerName);
+                };
             });
 
             builder.Services.AddSingleton<IEventWriter<PointsEvent>, CosmosEventWriter>();
             builder.Services.AddSingleton<IGameTimer, CosmosTimer>();
+            builder.Services.AddSingleton<ICosmosTimerClient, TimerClient>();
             builder.Services.AddMemoryCache();
             builder.Services.AddSingleton<PlayerCache>();
 
-            builder.Services.AddOptions<IOptions<TimeoutOptions>>()
-                .Bind(configuration.GetSection("Timeout"));
-            builder.Services.AddOptions<IOptions<EventFeedOptions>>()
-                .Bind(configuration.GetSection("EventFeed"));
+            builder.Services.AddOptions<TimeoutOptions>().Configure<IConfiguration>(
+                (settings, config) => config.GetSection("Timeout").Bind(settings));
+
+            builder.Services.AddOptions<EventFeedOptions>()
+                .Configure<IConfiguration>((settings, config) => config.GetSection("EventFeed").Bind(settings));
 
             builder.Services.AddSingleton(
                 CloudStorageAccount.Parse(configuration["PointsReadModelConnectionString"]));

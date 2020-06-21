@@ -3,19 +3,20 @@ using System.Net;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Options;
 using PointsBot.Core;
 
 namespace PointsBot.Infrastructure
 {
-    internal class TimerClient : ICosmosTimerClient
+    public class TimerClient : ICosmosTimerClient
     {
         private readonly Func<string, Container> _containerFactory;
         private readonly TimeoutOptions _timeout;
 
-        public TimerClient(Func<string, Container> containerFactory, TimeoutOptions timeout)
+        public TimerClient(Func<string, Container> containerFactory, IOptions<TimeoutOptions> timeout)
         {
             _containerFactory = containerFactory;
-            _timeout = timeout;
+            _timeout = timeout.Value;
         }
 
         public async Task<ResponseMessage> GetPlayerTimeoutRecord(string source, string playerId)
