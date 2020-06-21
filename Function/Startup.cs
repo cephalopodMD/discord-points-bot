@@ -49,6 +49,8 @@ namespace Function
             builder.Services.AddSingleton<IEventWriter<PointsEvent>, CosmosEventWriter>();
             builder.Services.AddSingleton<IGameTimer, CosmosTimer>();
             builder.Services.AddSingleton<ICosmosTimerClient, TimerClient>();
+            builder.Services.AddSingleton<ICosmosPointsClient, PointsClient>();
+
             builder.Services.AddMemoryCache();
             builder.Services.AddSingleton<PlayerCache>();
 

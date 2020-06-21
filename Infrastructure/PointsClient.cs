@@ -52,7 +52,7 @@ namespace PointsBot.Infrastructure
             var container = _containerFactory(_eventFeedOptions.ContainerName);
             var updatedPlayer = new CosmosItem
             {
-                id = source,
+                id = $"{source}_{playerId}",
                 source = source,
                 Events = newEvents
             };
