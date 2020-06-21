@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Function.Commands;
 using Function.Events;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -22,8 +21,7 @@ namespace Function
 
         private static readonly CosmosClientOptions CosmosClientOptions = new CosmosClientOptions
         {
-            ApplicationName = "PBot",
-            ConsistencyLevel = ConsistencyLevel.ConsistentPrefix
+            ApplicationName = "PBot"
         };
 
         public override void Configure(IFunctionsHostBuilder builder)
@@ -67,6 +65,9 @@ namespace Function
 
                 return tableName => tableClient.GetTableReference(tableName);
             });
+
+            builder.Services.AddSingleton<PointsStorage>();
+            builder.Services.AddSingleton<PlayerStorage>();
         }
     }
 }

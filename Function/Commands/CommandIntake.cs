@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Function.Events;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 using PointsBot.Core;
 
 namespace Function.Commands
@@ -20,14 +16,17 @@ namespace Function.Commands
         private readonly IEventWriter<PointsEvent> _pointsEventWriter;
         private readonly Func<int> _maxPointsPerAction;
         private readonly PlayerCache _playerCache;
+        private readonly PlayerStorage _playerStorage;
 
-        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, Func<int> maxPointsPerAction, IGameTimer gameTimer, IEventWriter<PointsEvent> pointsEventWriter, PlayerCache playerCache)
+        public CommandIntake(Func<JsonDocument, PointsEvent> eventsFactory, 
+            Func<int> maxPointsPerAction, IGameTimer gameTimer, IEventWriter<PointsEvent> pointsEventWriter, PlayerCache playerCache, PlayerStorage playerStorage)
         {
             _eventsFactory = eventsFactory;
             _maxPointsPerAction = maxPointsPerAction;
             _gameTimer = gameTimer;
             _pointsEventWriter = pointsEventWriter;
             _playerCache = playerCache;
+            _playerStorage = playerStorage;
         }
         
         [FunctionName("CommandIntake")]
@@ -49,12 +48,9 @@ namespace Function.Commands
         }
 
         [FunctionName("ChangeFeedProcessor")]
-        [StorageAccount("PointsReadModelConnectionString")]
         public async Task ProcessChangeFeed(
             [CosmosDBTrigger("points_bot", "points_events_monitored", CreateLeaseCollectionIfNotExists = true, ConnectionStringSetting = "CosmosConnectionString")]
-            IReadOnlyList<Document> changes,
-            [Table("points")] CloudTable pointsTable
-        )
+            IReadOnlyList<Document> changes)
         {
             if (changes.Count <= 0) return;
 
@@ -62,7 +58,7 @@ namespace Function.Commands
             foreach (var change in changes)
             {
                 var playerId = ParseId(change.Id);
-                var playerPoints = await _playerCache.GetPlayer(pointsTable, playerId);
+                var playerPoints = await _playerCache.GetPlayer(playerId);
 
                 var pointsEvents = change.GetPropertyValue<IEnumerable<PointsEvent>>("Events").ToList();
                 if (pointsEvents.Count == playerPoints.LastEventIndex) continue;
@@ -80,15 +76,7 @@ namespace Function.Commands
                 } while (eventIndex < pointsEvents.Count);
                 playerPoints.LastEventIndex = eventIndex - 1;
 
-                var mergeAction = TableOperation.Merge(playerPoints);
-                var mergeResult = await pointsTable.ExecuteAsync(mergeAction);
-
-                if (mergeResult.HttpStatusCode >= 500)
-                {
-                    throw new WebException($"Error updating player (Player: {playerId}  : {mergeResult.Result} ",
-                        WebExceptionStatus.UnknownError);
-                }
-
+                await _playerStorage.UpdatePlayer(playerPoints);
                 updatedPlayers.Add(playerPoints);
             }
 

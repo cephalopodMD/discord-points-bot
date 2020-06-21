@@ -34,14 +34,17 @@ namespace PointsBot.Infrastructure
             return cosmosItem.Events;
         }
 
-        private static Task CreatePointsRecord(Container container, string source, string playerId)
+        private static async Task CreatePointsRecord(Container container, string source, string playerId)
         {
-            return container.CreateItemAsync(new CosmosItem
+            var createdRecordResponse = await container.CreateItemAsync(new CosmosItem
             {
                 id = $"{source}_{playerId}",
                 source = source,
                 Events = new List<PointsEvent>()
             });
+
+            if (createdRecordResponse.StatusCode == HttpStatusCode.InternalServerError)
+                throw new Exception($"Error occured trying to create new player {playerId}");
         }
 
         public Task UpdatePlayer(string source, string playerId, ICollection<PointsEvent> newEvents)
