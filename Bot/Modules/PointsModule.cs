@@ -67,38 +67,38 @@ namespace Bot.Modules
             Context.Channel.SendMessageAsync("Transaction complete.")
         };
 
-        [Command("give")]
+        [Command("give", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
         public async Task GiveWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to give. Try @PBot give {user.Mention} 420");
 
-        [Command("give")]
+        [Command("give", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, string amountOfPoints) => await Context.Channel.SendMessageAsync($"`give` only accepts numbers. Maybe some day we give and take words...");
 
-        [Command("give")]
+        [Command("give", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints) => await TrySendCommand(user, () => AddPoints(user, amountOfPoints));
 
-        [Command("give")]
+        [Command("give", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
         public async Task GivePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest) => await TrySendCommand(user, () => AddPoints(user, amountOfPoints));
 
-        [Command("take")]
+        [Command("take", RunMode = RunMode.Async)]
         public async Task TakeWithNoAmount(IGuildUser user) => await Context.Channel.SendMessageAsync($"Must specify an amount to take. Try @PBot take {user.Mention} 69");
 
-        [Command("take")]
+        [Command("take", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, string amountOfPoints) => await Context.Channel.SendMessageAsync($"`take` only accepts numbers. . Maybe some day we give and take words...");
 
-        [Command("take")]
+        [Command("take", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints) => await TrySendCommand(user, () => RemovePoints(user, amountOfPoints));
 
-        [Command("take")]
+        [Command("take", RunMode = RunMode.Async)]
         [RequireContext(ContextType.Guild)]
         public async Task TakePoints(IGuildUser user, int amountOfPoints, [Remainder] string theRest) => await TrySendCommand(user, () => RemovePoints(user, amountOfPoints));
 
-        [Command("bank")]
+        [Command("bank", RunMode = RunMode.Async)]
         public async Task GetTotalForUser(IGuildUser user)
         {
             var httpClient = _httpClientFactory.CreateClient();
@@ -109,7 +109,7 @@ namespace Bot.Modules
             await Context.Channel.SendMessageAsync($"{playerState.TotalPoints}");
         }
 
-        [Command("bank")]
+        [Command("bank", RunMode = RunMode.Async)]
         public async Task GetTotalForUser()
         {
             var httpClient = _httpClientFactory.CreateClient();
@@ -120,7 +120,7 @@ namespace Bot.Modules
             await Context.Channel.SendMessageAsync($"{playerState.TotalPoints}");
         }
 
-        [Command("help")]
+        [Command("help", RunMode = RunMode.Async)]
         public async Task PrintHelp()
         {
             await Context.User.SendMessageAsync(

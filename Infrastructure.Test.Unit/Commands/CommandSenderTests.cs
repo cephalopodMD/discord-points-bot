@@ -1,11 +1,10 @@
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PointsBot.Infrastructure.Commands;
 
-namespace Infrastructure.Test.Unit
+namespace Infrastructure.Test.Unit.Commands
 {
     [TestClass]
     public class CommandSenderTests
