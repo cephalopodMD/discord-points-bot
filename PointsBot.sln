@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{4A3F6E35-05DE-4520-9895-6FE2F5974FA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Durable", "Durable\Durable.csproj", "{BDC8F4EE-A434-4807-8927-BFF3D4E96912}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Durable", "Durable\Durable.csproj", "{BDC8F4EE-A434-4807-8927-BFF3D4E96912}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
