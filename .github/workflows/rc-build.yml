@@ -1,0 +1,46 @@
+name: .NET Core PR
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+
+    - name: Upload Bot Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: bot_drop
+        path: ${{ github.workspace }}\Bot\bin\Release\netcoreapp3.1
+
+    - name: Upload Function Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: function_drop
+        path: ${{ github.workspace }}\Function\bin\Release\netcoreapp3.1
+
+    - name: Upload Durable Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: durable_drop
+        path: ${{ github.workspace }}\Durable\bin\Release\netcoreapp3.1
+
