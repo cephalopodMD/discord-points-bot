@@ -1,8 +1,6 @@
-name: .NET Core 3 Build
+name: .NET Core PR
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
