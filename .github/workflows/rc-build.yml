@@ -3,10 +3,11 @@ name: .NET Core RC
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+        - "**.md"
 
 jobs:
   build:
-
     runs-on: windows-latest
 
     steps:

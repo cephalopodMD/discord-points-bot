@@ -3,6 +3,8 @@ name: .NET Core PR
 on:
   pull_request:
     branches: [ master ]
+    paths-ignore:
+        - "**.md"
 
 jobs:
   build:
@@ -22,6 +24,6 @@ jobs:
 
     - name: Build
       run: dotnet build --configuration Release --no-restore
-      
+
     - name: Test
       run: dotnet test --no-restore --verbosity normal
