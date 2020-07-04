@@ -1,4 +1,4 @@
-# discord-points-bot ![.NET Core 3 Build](https://github.com/a-sink-a-wait/discord-points-bot/workflows/.NET%20Core%203%20Build/badge.svg?branch=master)
+# discord-points-bot ![.NET Core 3 Build](https://github.com/a-sink-a-wait/discord-points-bot/workflows/.NET%20Core%203%20Build/badge.svg?branch=master) ![.NET Core RC](https://github.com/a-sink-a-wait/discord-points-bot/workflows/.NET%20Core%20RC/badge.svg?branch=master&event=push)
 A derpy bot for Discord. Give and take arbitrary points from channel members :)
 
 ## Bot
