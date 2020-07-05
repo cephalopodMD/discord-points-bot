@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Bot.Services;
 using Discord;
@@ -42,7 +43,8 @@ namespace Bot
                 })
                 .Build();
 
-            using (host)
+            var cancellationTokenSource = new CancellationTokenSource();
+            using (host.StartAsync(cancellationTokenSource.Token))
             {
                 var services = host.Services;
                 var configuration = host.Services.GetRequiredService<IConfiguration>();
@@ -51,15 +53,12 @@ namespace Bot
                 client.Log += LogAsync;
                 services.GetRequiredService<CommandService>().Log += LogAsync;
 
-                // Tokens should be considered secret data and never hard-coded.
-                // We can read from the environment variable to avoid hardcoding.
                 await client.LoginAsync(TokenType.Bot, configuration["token"]);
                 await client.StartAsync();
 
-                // Here we initialize the logic required to register our commands.
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
-                await Task.Delay(-1);
+                await Task.Delay(-1, cancellationTokenSource.Token);
             }
         }
 
